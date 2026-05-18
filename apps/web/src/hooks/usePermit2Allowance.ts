@@ -1,5 +1,5 @@
-import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk'
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { permit2Address } from '@fenine/permit2-sdk'
+import { ChainId, CurrencyAmount, Token } from '@fenine/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import { AVERAGE_L1_BLOCK_TIME } from 'constants/chainInfo'
 import { PermitSignature, usePermitAllowance, useUpdatePermitAllowance } from 'hooks/usePermitAllowance'
@@ -49,12 +49,13 @@ export default function usePermit2Allowance(
   spender?: string,
   tradeFillType?: TradeFillType
 ): Allowance {
-  const { account } = useWeb3React()
+  const { account, chainId } = useWeb3React()
   const token = amount?.currency
+  const currentPermit2Address = permit2Address(chainId ?? ChainId.MAINNET)
 
-  const { tokenAllowance, isSyncing: isApprovalSyncing } = useTokenAllowance(token, account, PERMIT2_ADDRESS)
-  const updateTokenAllowance = useUpdateTokenAllowance(amount, PERMIT2_ADDRESS)
-  const revokeTokenAllowance = useRevokeTokenAllowance(token, PERMIT2_ADDRESS)
+  const { tokenAllowance, isSyncing: isApprovalSyncing } = useTokenAllowance(token, account, currentPermit2Address)
+  const updateTokenAllowance = useUpdateTokenAllowance(amount, currentPermit2Address)
+  const revokeTokenAllowance = useRevokeTokenAllowance(token, currentPermit2Address)
   const isApproved = useMemo(() => {
     if (!amount || !tokenAllowance) return false
     return tokenAllowance.greaterThan(amount) || tokenAllowance.equalTo(amount)
@@ -65,8 +66,8 @@ export default function usePermit2Allowance(
   // until it has been re-observed. It wll sync immediately, because confirmation fast-forwards the block number.
   const [approvalState, setApprovalState] = useState(ApprovalState.SYNCED)
   const isApprovalLoading = approvalState !== ApprovalState.SYNCED
-  const isApprovalPending = useHasPendingApproval(token, PERMIT2_ADDRESS)
-  const isRevocationPending = useHasPendingRevocation(token, PERMIT2_ADDRESS)
+  const isApprovalPending = useHasPendingApproval(token, currentPermit2Address)
+  const isRevocationPending = useHasPendingRevocation(token, currentPermit2Address)
 
   useEffect(() => {
     if (isApprovalPending) {

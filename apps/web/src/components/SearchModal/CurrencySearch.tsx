@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { t, Trans } from '@lingui/macro'
 import { InterfaceEventName, InterfaceModalName } from '@uniswap/analytics-events'
-import { ChainId, Currency, CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { ChainId, Currency, CurrencyAmount, Token } from '@fenine/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import { Trace } from 'analytics'
 import { useCachedPortfolioBalancesQuery } from 'components/PrefetchBalancesWrapper/PrefetchBalancesWrapper'

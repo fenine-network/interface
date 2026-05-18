@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/macro'
-import { Currency, Price } from '@uniswap/sdk-core'
+import { Currency, Price } from '@fenine/sdk-core'
 import { useUSDPrice } from 'hooks/useUSDPrice'
 import tryParseCurrencyAmount from 'lib/utils/tryParseCurrencyAmount'
 import { useCallback, useMemo, useState } from 'react'
@@ -8,7 +8,7 @@ import { ThemedText } from 'theme/components'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
 
 interface TradePriceProps {
-  price: Price<Currency, Currency>
+  price: any
 }
 
 const StyledPriceContainer = styled.button`

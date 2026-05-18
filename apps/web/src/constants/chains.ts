@@ -1,6 +1,28 @@
-import { ChainId, SUPPORTED_CHAINS, SupportedChainsType } from '@uniswap/sdk-core'
+import { ChainId, SUPPORTED_CHAINS, SupportedChainsType } from '@fenine/sdk-core'
+
+// Chains supported by this interface
+export const INTERFACE_SUPPORTED_CHAINS = [
+  ChainId.FENINE,
+  ChainId.MAINNET,
+  ChainId.GOERLI,
+  ChainId.SEPOLIA,
+  ChainId.POLYGON,
+  ChainId.POLYGON_MUMBAI,
+  ChainId.CELO,
+  ChainId.CELO_ALFAJORES,
+  ChainId.ARBITRUM_ONE,
+  ChainId.ARBITRUM_GOERLI,
+  ChainId.OPTIMISM,
+  ChainId.OPTIMISM_GOERLI,
+  ChainId.BNB,
+  ChainId.AVALANCHE,
+  ChainId.BASE,
+] as const
+
+export type SupportedInterfaceChain = (typeof INTERFACE_SUPPORTED_CHAINS)[number]
 
 export const CHAIN_IDS_TO_NAMES = {
+  [ChainId.FENINE]: 'fenine',
   [ChainId.MAINNET]: 'mainnet',
   [ChainId.GOERLI]: 'goerli',
   [ChainId.SEPOLIA]: 'sepolia',
@@ -20,9 +42,6 @@ export const CHAIN_IDS_TO_NAMES = {
 // Include ChainIds in this array if they are not supported by the UX yet, but are already in the SDK.
 const NOT_YET_UX_SUPPORTED_CHAIN_IDS: number[] = [ChainId.BASE_GOERLI]
 
-// TODO: include BASE_GOERLI when routing is implemented
-export type SupportedInterfaceChain = Exclude<SupportedChainsType, ChainId.BASE_GOERLI>
-
 export function isSupportedChain(
   chainId: number | null | undefined | ChainId,
   featureFlags?: Record<number, boolean>
@@ -30,7 +49,7 @@ export function isSupportedChain(
   if (featureFlags && chainId && chainId in featureFlags) {
     return featureFlags[chainId]
   }
-  return !!chainId && SUPPORTED_CHAINS.indexOf(chainId) !== -1 && NOT_YET_UX_SUPPORTED_CHAIN_IDS.indexOf(chainId) === -1
+  return !!chainId && (INTERFACE_SUPPORTED_CHAINS as readonly number[]).indexOf(chainId) !== -1
 }
 
 export function asSupportedChain(
@@ -73,6 +92,7 @@ export const TESTNET_CHAIN_IDS = [
  * All the chain IDs that are running the Ethereum protocol.
  */
 export const L1_CHAIN_IDS = [
+  ChainId.FENINE,
   ChainId.MAINNET,
   ChainId.GOERLI,
   ChainId.SEPOLIA,
@@ -107,30 +127,32 @@ export type SupportedL2ChainId = (typeof L2_CHAIN_IDS)[number]
  */
 export function getChainPriority(chainId: ChainId): number {
   switch (chainId) {
+    case ChainId.FENINE:
+      return 0
     case ChainId.MAINNET:
     case ChainId.GOERLI:
     case ChainId.SEPOLIA:
-      return 0
+      return 1
     case ChainId.ARBITRUM_ONE:
     case ChainId.ARBITRUM_GOERLI:
-      return 1
+      return 2
     case ChainId.OPTIMISM:
     case ChainId.OPTIMISM_GOERLI:
-      return 2
+      return 3
     case ChainId.POLYGON:
     case ChainId.POLYGON_MUMBAI:
-      return 3
-    case ChainId.BASE:
       return 4
-    case ChainId.BNB:
+    case ChainId.BASE:
       return 5
-    case ChainId.AVALANCHE:
+    case ChainId.BNB:
       return 6
+    case ChainId.AVALANCHE:
+      return 7
     case ChainId.CELO:
     case ChainId.CELO_ALFAJORES:
-      return 7
-    default:
       return 8
+    default:
+      return 9
   }
 }
 

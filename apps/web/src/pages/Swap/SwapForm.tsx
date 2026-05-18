@@ -7,8 +7,8 @@ import {
   SharedEventName,
   SwapEventName,
 } from '@uniswap/analytics-events'
-import { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core'
-import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
+import { Currency, CurrencyAmount, Token } from '@fenine/sdk-core'
+import { getUniversalRouterAddress } from 'constants/addresses'
 import { useWeb3React } from '@web3-react/core'
 import { sendAnalyticsEvent, Trace, TraceEvent, useTrace } from 'analytics'
 import { useToggleAccountDrawer } from 'components/AccountDrawer'
@@ -318,7 +318,7 @@ export function SwapForm({ disableTokenInputs = false, onCurrencyChange }: SwapF
       (parsedAmounts[Field.INPUT]?.currency.isToken
         ? (parsedAmounts[Field.INPUT] as CurrencyAmount<Token>)
         : undefined),
-    isSupportedChain(chainId) ? UNIVERSAL_ROUTER_ADDRESS(chainId) : undefined,
+    isSupportedChain(chainId) ? getUniversalRouterAddress(chainId) : undefined,
     trade?.fillType
   )
 

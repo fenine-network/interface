@@ -1,5 +1,5 @@
 import { t } from '@lingui/macro'
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import { initializeConnector } from '@web3-react/core'
 import { GnosisSafe } from '@web3-react/gnosis-safe'
@@ -59,7 +59,7 @@ export const eip6963Connection: InjectedConnection = {
 }
 
 const [web3Network, web3NetworkHooks] = initializeConnector<Network>(
-  (actions) => new Network({ actions, urlMap: RPC_PROVIDERS, defaultChainId: 1 })
+  (actions) => new Network({ actions, urlMap: RPC_PROVIDERS, defaultChainId: ChainId.FENINE })
 )
 export const networkConnection: Connection = {
   getProviderInfo: () => ({ name: 'Network' }),
@@ -74,7 +74,7 @@ const [deprecatedWeb3Network, deprecatedWeb3NetworkHooks] = initializeConnector<
     new Network({
       actions,
       urlMap: DEPRECATED_RPC_PROVIDERS,
-      defaultChainId: 1,
+      defaultChainId: ChainId.FENINE,
     })
 )
 export const deprecatedNetworkConnection: Connection = {
@@ -120,7 +120,7 @@ export const gnosisSafeConnection: Connection = {
 }
 
 export const walletConnectV2Connection: Connection = new (class implements Connection {
-  private initializer = (actions: Actions, defaultChainId = ChainId.MAINNET) =>
+  private initializer = (actions: Actions, defaultChainId = ChainId.FENINE) =>
     new WalletConnectV2({ actions, defaultChainId, onError })
 
   type = ConnectionType.WALLET_CONNECT_V2

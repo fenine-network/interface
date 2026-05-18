@@ -1,4 +1,4 @@
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 import AppRpcProvider from 'rpc/AppRpcProvider'
 import AppStaticJsonRpcProvider from 'rpc/StaticJsonRpcProvider'
 import StaticJsonRpcProvider from 'rpc/StaticJsonRpcProvider'
@@ -13,6 +13,7 @@ const providerFactory = (chainId: SupportedInterfaceChain, i = 0) =>
  * These are the only JsonRpcProviders used directly by the interface.
  */
 export const RPC_PROVIDERS: { [key in SupportedInterfaceChain]: StaticJsonRpcProvider } = {
+  [ChainId.FENINE]: providerFactory(ChainId.FENINE),
   [ChainId.MAINNET]: new AppRpcProvider(ChainId.MAINNET, [
     providerFactory(ChainId.MAINNET),
     providerFactory(ChainId.MAINNET, 1),
@@ -33,6 +34,7 @@ export const RPC_PROVIDERS: { [key in SupportedInterfaceChain]: StaticJsonRpcPro
 }
 
 export const DEPRECATED_RPC_PROVIDERS: { [key in SupportedInterfaceChain]: AppStaticJsonRpcProvider } = {
+  [ChainId.FENINE]: providerFactory(ChainId.FENINE),
   [ChainId.MAINNET]: providerFactory(ChainId.MAINNET),
   [ChainId.GOERLI]: providerFactory(ChainId.GOERLI),
   [ChainId.SEPOLIA]: providerFactory(ChainId.SEPOLIA),

@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro'
-import { ChainId, SUPPORTED_CHAINS } from '@uniswap/sdk-core'
-import { FeeAmount } from '@uniswap/v3-sdk'
+import { ChainId, SUPPORTED_CHAINS } from '@fenine/sdk-core'
+import { FeeAmount } from '@fenine/v3-sdk'
 import type { ReactNode } from 'react'
 
 export const FEE_AMOUNT_DETAIL: Record<
@@ -11,6 +11,7 @@ export const FEE_AMOUNT_DETAIL: Record<
     label: '0.01',
     description: <Trans>Best for very stable pairs.</Trans>,
     supportedChains: [
+      ChainId.FENINE,
       ChainId.ARBITRUM_ONE,
       ChainId.BNB,
       ChainId.CELO,
@@ -22,6 +23,21 @@ export const FEE_AMOUNT_DETAIL: Record<
       ChainId.AVALANCHE,
       ChainId.BASE,
     ],
+  },
+  [FeeAmount.LOW_200]: {
+    label: '0.02',
+    description: <Trans>Best for very stable pairs.</Trans>,
+    supportedChains: SUPPORTED_CHAINS,
+  },
+  [FeeAmount.LOW_300]: {
+    label: '0.03',
+    description: <Trans>Best for stable pairs.</Trans>,
+    supportedChains: SUPPORTED_CHAINS,
+  },
+  [FeeAmount.LOW_400]: {
+    label: '0.04',
+    description: <Trans>Best for stable pairs.</Trans>,
+    supportedChains: SUPPORTED_CHAINS,
   },
   [FeeAmount.LOW]: {
     label: '0.05',

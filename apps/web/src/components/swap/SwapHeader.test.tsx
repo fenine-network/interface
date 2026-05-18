@@ -1,4 +1,4 @@
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 import { PropsWithChildren } from 'react'
 import { EMPTY_DERIVED_SWAP_INFO, SwapContext } from 'state/swap/SwapContext'
 import { render, screen } from 'test-utils/render'

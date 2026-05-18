@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro'
-import { Currency, Price, Token } from '@uniswap/sdk-core'
-import { FeeAmount } from '@uniswap/v3-sdk'
+import { Currency, Price, Token } from '@fenine/sdk-core'
+import { FeeAmount } from '@fenine/v3-sdk'
 import { AutoColumn, ColumnCenter } from 'components/Column'
 import Loader from 'components/Icons/LoadingSpinner'
 import { useColor } from 'hooks/useColor'
@@ -19,6 +19,24 @@ import { ZoomLevels } from './types'
 
 const ZOOM_LEVELS: Record<FeeAmount, ZoomLevels> = {
   [FeeAmount.LOWEST]: {
+    initialMin: 0.999,
+    initialMax: 1.001,
+    min: 0.00001,
+    max: 1.5,
+  },
+  [FeeAmount.LOW_200]: {
+    initialMin: 0.999,
+    initialMax: 1.001,
+    min: 0.00001,
+    max: 1.5,
+  },
+  [FeeAmount.LOW_300]: {
+    initialMin: 0.999,
+    initialMax: 1.001,
+    min: 0.00001,
+    max: 1.5,
+  },
+  [FeeAmount.LOW_400]: {
     initialMin: 0.999,
     initialMax: 1.001,
     min: 0.00001,

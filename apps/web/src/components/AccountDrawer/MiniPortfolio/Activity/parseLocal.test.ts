@@ -1,5 +1,5 @@
-import { ChainId, Token, TradeType as MockTradeType } from '@uniswap/sdk-core'
-import { PERMIT2_ADDRESS } from '@uniswap/universal-router-sdk'
+import { permit2Address } from '@fenine/permit2-sdk'
+import { ChainId, Token, TradeType as MockTradeType } from '@fenine/sdk-core'
 import { DAI as MockDAI, nativeOnChain, USDC_MAINNET as MockUSDC_MAINNET, USDT as MockUSDT } from 'constants/tokens'
 import { TransactionStatus as MockTxStatus } from 'graphql/data/__generated__/types-and-hooks'
 import { ChainTokenMap } from 'hooks/Tokens'
@@ -52,7 +52,7 @@ function mockSwapInfo(
 const mockAccount1 = '0x000000000000000000000000000000000000000001'
 const mockAccount2 = '0x000000000000000000000000000000000000000002'
 const mockChainId = ChainId.MAINNET
-const mockSpenderAddress = PERMIT2_ADDRESS[mockChainId]
+const mockSpenderAddress = permit2Address(mockChainId)
 const mockCurrencyAmountRaw = '1000000000000000000'
 const mockCurrencyAmountRawUSDC = '1000000'
 const mockApprovalAmountRaw = '10000000'

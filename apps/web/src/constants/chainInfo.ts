@@ -1,4 +1,4 @@
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 import ms from 'ms'
 import { darkTheme } from 'theme/colors'
 
@@ -9,6 +9,7 @@ export const AVERAGE_L1_BLOCK_TIME = ms(`12s`)
 
 // The block number at which v3 was deployed on each chain, separate from the UNIVERSAL_ROUTER_CREATION_BLOCK
 export const START_BLOCKS: { [key: number]: number } = {
+  [ChainId.FENINE]: 0,
   [ChainId.MAINNET]: 14292820,
   [ChainId.POLYGON]: 25459720,
   [ChainId.ARBITRUM_ONE]: 175,
@@ -58,6 +59,16 @@ type ChainInfoMap = { readonly [chainId: number]: L1ChainInfo | L2ChainInfo } & 
 } & { readonly [chainId in SupportedL1ChainId]: L1ChainInfo }
 
 const CHAIN_INFO: ChainInfoMap = {
+  [ChainId.FENINE]: {
+    networkType: NetworkType.L1,
+    docs: 'https://docs.fene.app/',
+    explorer: 'https://explorer.fene.app/',
+    infoLink: 'https://info.fene.app/',
+    label: 'Fenine',
+    nativeCurrency: { name: 'Fenine', symbol: 'FEN', decimals: 18 },
+    color: '#FF6B35',
+    backgroundColor: '#FF6B3520',
+  },
   [ChainId.MAINNET]: {
     networkType: NetworkType.L1,
     docs: 'https://docs.uniswap.org/',

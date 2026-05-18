@@ -1,8 +1,8 @@
-import { ChainId, CurrencyAmount, Percent, Token, TradeType } from '@uniswap/sdk-core'
+import { ChainId, CurrencyAmount, Percent, Token, TradeType } from '@fenine/sdk-core'
 // This is a test file, so the import of smart-order-router is allowed.
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { V3Route } from '@uniswap/smart-order-router'
-import { FeeAmount, Pool } from '@uniswap/v3-sdk'
+import { V3Route } from '@fenine/smart-order-router'
+import { FeeAmount, Pool } from '@fenine/v3-sdk'
 import { nativeOnChain } from 'constants/tokens'
 import { BigNumber } from 'ethers/lib/ethers'
 import JSBI from 'jsbi'
@@ -38,7 +38,7 @@ export const toCurrencyAmount = (token: Token, amount: number) =>
 export const TEST_TRADE_EXACT_INPUT = new ClassicTrade({
   v3Routes: [
     {
-      routev3: new V3Route([TEST_POOL_12], TEST_TOKEN_1, TEST_TOKEN_2),
+      routev3: new V3Route([TEST_POOL_12 as any], TEST_TOKEN_1, TEST_TOKEN_2) as any,
       inputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
       outputAmount: toCurrencyAmount(TEST_TOKEN_2, 1000),
     },
@@ -53,7 +53,7 @@ export const TEST_TRADE_EXACT_INPUT = new ClassicTrade({
 export const TEST_TRADE_EXACT_INPUT_API = new ClassicTrade({
   v3Routes: [
     {
-      routev3: new V3Route([TEST_POOL_12], TEST_TOKEN_1, TEST_TOKEN_2),
+      routev3: new V3Route([TEST_POOL_12 as any], TEST_TOKEN_1, TEST_TOKEN_2) as any,
       inputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
       outputAmount: toCurrencyAmount(TEST_TOKEN_2, 1000),
     },
@@ -68,7 +68,7 @@ export const TEST_TRADE_EXACT_INPUT_API = new ClassicTrade({
 export const TEST_TRADE_EXACT_OUTPUT = new ClassicTrade({
   v3Routes: [
     {
-      routev3: new V3Route([TEST_POOL_13], TEST_TOKEN_1, TEST_TOKEN_3),
+      routev3: new V3Route([TEST_POOL_13 as any], TEST_TOKEN_1, TEST_TOKEN_3) as any,
       inputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
       outputAmount: toCurrencyAmount(TEST_TOKEN_3, 1000),
     },
@@ -141,7 +141,7 @@ const TEST_POOL_FOT_1 = new Pool(
 export const TEST_TRADE_FEE_ON_SELL = new ClassicTrade({
   v3Routes: [
     {
-      routev3: new V3Route([TEST_POOL_FOT_1], SELL_FEE_TOKEN, TEST_TOKEN_2),
+      routev3: new V3Route([TEST_POOL_FOT_1 as any], SELL_FEE_TOKEN, TEST_TOKEN_2) as any,
       inputAmount: toCurrencyAmount(SELL_FEE_TOKEN, 1000),
       outputAmount: toCurrencyAmount(TEST_TOKEN_2, 1000),
     },
@@ -174,7 +174,7 @@ const TEST_POOL_FOT_2 = new Pool(
 export const TEST_TRADE_FEE_ON_BUY = new ClassicTrade({
   v3Routes: [
     {
-      routev3: new V3Route([TEST_POOL_FOT_2], TEST_TOKEN_1, BUY_FEE_TOKEN),
+      routev3: new V3Route([TEST_POOL_FOT_2 as any], TEST_TOKEN_1, BUY_FEE_TOKEN) as any,
       inputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
       outputAmount: toCurrencyAmount(BUY_FEE_TOKEN, 1000),
     },

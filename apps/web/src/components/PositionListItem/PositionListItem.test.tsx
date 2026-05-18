@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ChainId, Token, WETH9 } from '@uniswap/sdk-core'
-import { FeeAmount, Pool } from '@uniswap/v3-sdk'
+import { ChainId, Token, WETH9 } from '@fenine/sdk-core'
+import { FeeAmount, Pool } from '@fenine/v3-sdk'
 import { USDC_MAINNET } from 'constants/tokens'
 import { useToken } from 'hooks/Tokens'
 import { PoolState } from 'hooks/usePools'

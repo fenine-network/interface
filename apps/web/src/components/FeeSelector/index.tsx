@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro'
 import { FeePoolSelectAction, LiquidityEventName } from '@uniswap/analytics-events'
-import { Currency } from '@uniswap/sdk-core'
-import { FeeAmount } from '@uniswap/v3-sdk'
+import { Currency } from '@fenine/sdk-core'
+import { FeeAmount } from '@fenine/v3-sdk'
 import { useWeb3React } from '@web3-react/core'
 import { sendAnalyticsEvent, useTrace } from 'analytics'
 import { ButtonGray } from 'components/Button'
@@ -88,6 +88,9 @@ export default function FeeSelector({
         {
           // default all states to NOT_EXISTS
           [FeeAmount.LOWEST]: PoolState.NOT_EXISTS,
+          [FeeAmount.LOW_200]: PoolState.NOT_EXISTS,
+          [FeeAmount.LOW_300]: PoolState.NOT_EXISTS,
+          [FeeAmount.LOW_400]: PoolState.NOT_EXISTS,
           [FeeAmount.LOW]: PoolState.NOT_EXISTS,
           [FeeAmount.MEDIUM]: PoolState.NOT_EXISTS,
           [FeeAmount.HIGH]: PoolState.NOT_EXISTS,

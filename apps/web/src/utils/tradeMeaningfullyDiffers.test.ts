@@ -1,7 +1,7 @@
-import { Percent, TradeType } from '@uniswap/sdk-core'
+import { Percent, TradeType } from '@fenine/sdk-core'
 // This is allowed in test files.
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { V3Route } from '@uniswap/smart-order-router'
+import { V3Route } from '@fenine/smart-order-router'
 import { ClassicTrade, QuoteMethod } from 'state/routing/types'
 import {
   TEST_POOL_13,
@@ -25,7 +25,7 @@ describe('tradeMeaningfullyDiffers', () => {
     const newTrade = new ClassicTrade({
       v3Routes: [
         {
-          routev3: new V3Route([TEST_POOL_13], TEST_TOKEN_3, TEST_TOKEN_1),
+          routev3: new V3Route([TEST_POOL_13 as any], TEST_TOKEN_3, TEST_TOKEN_1) as any,
           inputAmount: toCurrencyAmount(TEST_TOKEN_3, 1000),
           outputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
         },
@@ -43,7 +43,7 @@ describe('tradeMeaningfullyDiffers', () => {
     const newTrade = new ClassicTrade({
       v3Routes: [
         {
-          routev3: new V3Route([TEST_POOL_13], TEST_TOKEN_1, TEST_TOKEN_3),
+          routev3: new V3Route([TEST_POOL_13 as any], TEST_TOKEN_1, TEST_TOKEN_3) as any,
           inputAmount: toCurrencyAmount(TEST_TOKEN_1, 1000),
           outputAmount: toCurrencyAmount(TEST_TOKEN_3, 1000),
         },

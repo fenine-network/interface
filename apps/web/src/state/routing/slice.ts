@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
-import { Protocol } from '@uniswap/router-sdk'
+import { Protocol } from '@fenine/router-sdk'
 import { sendAnalyticsEvent } from 'analytics'
 import { isUniswapXSupportedChain } from 'constants/chains'
 import ms from 'ms'
@@ -110,6 +110,11 @@ export const routingApi = createApi({
       async queryFn(args, _api, _extraOptions, fetch) {
         logSwapQuoteRequest(args.tokenInChainId, args.routerPreference, false)
         const quoteStartMark = performance.mark(`quote-fetch-start-${Date.now()}`)
+
+        // For Fenine chain, skip API and go directly to client-side routing
+        const skipApi = args.tokenInChainId === 920 || args.tokenOutChainId === 920
+
+        if (!skipApi) {
         try {
           const {
             tokenInAddress: tokenIn,
@@ -172,6 +177,7 @@ export const routingApi = createApi({
             }`
           )
         }
+        } // end skipApi
 
         try {
           const { getRouter, getClientSideQuote } = await import('lib/hooks/routing/clientSideSmartOrderRouter')

@@ -1,5 +1,5 @@
-import { Currency, Token } from '@uniswap/sdk-core'
-import { FeeAmount } from '@uniswap/v3-sdk'
+import { Currency, Token } from '@fenine/sdk-core'
+import { FeeAmount } from '@fenine/v3-sdk'
 import useBlockNumber from 'lib/hooks/useBlockNumber'
 import ms from 'ms'
 import { useMemo } from 'react'
@@ -56,6 +56,9 @@ export function useFeeTierDistribution(
         ? {
             [FeeAmount.LOWEST]:
               poolStateVeryLow === PoolState.EXISTS ? (distributions[FeeAmount.LOWEST] ?? 0) * 100 : undefined,
+            [FeeAmount.LOW_200]: undefined,
+            [FeeAmount.LOW_300]: undefined,
+            [FeeAmount.LOW_400]: undefined,
             [FeeAmount.LOW]: poolStateLow === PoolState.EXISTS ? (distributions[FeeAmount.LOW] ?? 0) * 100 : undefined,
             [FeeAmount.MEDIUM]:
               poolStateMedium === PoolState.EXISTS ? (distributions[FeeAmount.MEDIUM] ?? 0) * 100 : undefined,
@@ -133,6 +136,9 @@ function usePoolTVL(token0: Token | undefined, token1: Token | undefined) {
         tvlByFeeTier[FeeAmount.LOWEST][1],
         sumToken1Tvl
       ),
+      [FeeAmount.LOW_200]: undefined,
+      [FeeAmount.LOW_300]: undefined,
+      [FeeAmount.LOW_400]: undefined,
       [FeeAmount.LOW]: mean(tvlByFeeTier[FeeAmount.LOW][0], sumToken0Tvl, tvlByFeeTier[FeeAmount.LOW][1], sumToken1Tvl),
       [FeeAmount.MEDIUM]: mean(
         tvlByFeeTier[FeeAmount.MEDIUM][0],

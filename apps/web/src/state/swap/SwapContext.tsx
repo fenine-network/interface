@@ -1,4 +1,4 @@
-import { ChainId, Percent } from '@uniswap/sdk-core'
+import { ChainId, Percent } from '@fenine/sdk-core'
 import { Field, SwapTab } from 'components/swap/constants'
 import { parsedQueryString } from 'hooks/useParsedQueryString'
 import { createContext, Dispatch, SetStateAction, useContext, useMemo, useState } from 'react'

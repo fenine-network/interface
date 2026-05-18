@@ -1,13 +1,13 @@
-import { Protocol } from '@uniswap/router-sdk'
-import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
-// This file is lazy-loaded, so the import of smart-order-router is intentional.
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { routeAmountsToString, SwapRoute } from '@uniswap/smart-order-router'
-import { Pool } from '@uniswap/v3-sdk'
+import { Protocol } from '@fenine/router-sdk'
+import { Currency, CurrencyAmount, TradeType } from '@fenine/sdk-core'
+import { Pool } from '@fenine/v3-sdk'
 import { QuoteResult, QuoteState, URAQuoteType } from 'state/routing/types'
 import { ClassicQuoteData, V2PoolInRoute, V3PoolInRoute } from 'state/routing/types'
 
-// from routing-api (https://github.com/Uniswap/routing-api/blob/main/lib/handlers/quote/quote.ts#L243-L311)
+function routeAmountsToString(route: any[]): string {
+  return route.map((r: any) => r.tokenPath?.map((t: any) => t.symbol).join(' → ')).join(', ')
+}
+
 export function transformSwapRouteToGetQuoteResult(
   tradeType: TradeType,
   amount: CurrencyAmount<Currency>,
@@ -21,7 +21,7 @@ export function transformSwapRouteToGetQuoteResult(
     gasPriceWei,
     methodParameters,
     blockNumber,
-  }: SwapRoute
+  }: any
 ): QuoteResult {
   const routeResponse: Array<(V3PoolInRoute | V2PoolInRoute)[]> = []
 
@@ -51,13 +51,13 @@ export function transformSwapRouteToGetQuoteResult(
           tokenIn: {
             chainId: tokenIn.chainId,
             decimals: tokenIn.decimals,
-            address: tokenIn.address,
+            address: tokenIn.isToken ? tokenIn.address : tokenIn.wrapped.address,
             symbol: tokenIn.symbol,
           },
           tokenOut: {
             chainId: tokenOut.chainId,
             decimals: tokenOut.decimals,
-            address: tokenOut.address,
+            address: tokenOut.isToken ? tokenOut.address : tokenOut.wrapped.address,
             symbol: tokenOut.symbol,
           },
           fee: nextPool.fee.toString(),
@@ -68,21 +68,21 @@ export function transformSwapRouteToGetQuoteResult(
           amountOut: edgeAmountOut,
         })
       } else {
-        const reserve0 = nextPool.reserve0
-        const reserve1 = nextPool.reserve1
+        const reserve0 = (nextPool as any).reserve0
+        const reserve1 = (nextPool as any).reserve1
 
         curRoute.push({
           type: 'v2-pool',
           tokenIn: {
             chainId: tokenIn.chainId,
             decimals: tokenIn.decimals,
-            address: tokenIn.address,
+            address: tokenIn.isToken ? tokenIn.address : tokenIn.wrapped.address,
             symbol: tokenIn.symbol,
           },
           tokenOut: {
             chainId: tokenOut.chainId,
             decimals: tokenOut.decimals,
-            address: tokenOut.address,
+            address: tokenOut.isToken ? tokenOut.address : tokenOut.wrapped.address,
             symbol: tokenOut.symbol,
           },
           reserve0: {

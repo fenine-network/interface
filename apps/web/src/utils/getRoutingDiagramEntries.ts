@@ -1,7 +1,7 @@
-import { Protocol } from '@uniswap/router-sdk'
-import { Currency, Percent, TradeType } from '@uniswap/sdk-core'
+import { Protocol } from '@fenine/router-sdk'
+import { Currency, Percent, TradeType } from '@fenine/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
-import { FeeAmount } from '@uniswap/v3-sdk'
+import { FeeAmount } from '@fenine/v3-sdk'
 import { ClassicTrade } from 'state/routing/types'
 
 export interface RoutingDiagramEntry {

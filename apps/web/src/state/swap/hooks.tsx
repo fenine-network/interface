@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/macro'
-import { ChainId, Currency, CurrencyAmount, Percent, TradeType } from '@uniswap/sdk-core'
+import { ChainId, Currency, CurrencyAmount, Percent, TradeType } from '@fenine/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import { Field } from 'components/swap/constants'
 import { useConnectionReady } from 'connection/eagerlyConnect'

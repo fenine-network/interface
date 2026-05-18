@@ -1,7 +1,7 @@
-import { IRoute, Protocol } from '@uniswap/router-sdk'
-import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
+import { IRoute, Protocol } from '@fenine/router-sdk'
+import { Currency, CurrencyAmount } from '@fenine/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
-import { Pool } from '@uniswap/v3-sdk'
+import { Pool } from '@fenine/v3-sdk'
 import { TokenAmountInput, TokenTradeRouteInput, TradePoolInput } from 'graphql/data/__generated__/types-and-hooks'
 import { ClassicTrade } from 'state/routing/types'
 
@@ -16,7 +16,7 @@ interface TradeTokenInputAmounts {
 }
 
 interface Swap {
-  route: IRoute<Currency, Currency, Pair | Pool>
+  route: IRoute<Currency, Currency, any>
   inputAmount: CurrencyAmount<Currency>
   outputAmount: CurrencyAmount<Currency>
 }
@@ -97,7 +97,7 @@ function buildPool(pool: Pair | Pool): TradePoolInput {
   }
 }
 
-function buildPools(pools: (Pair | Pool)[]): TradePoolInput[] {
+function buildPools(pools: Array<Pair | Pool | any>): TradePoolInput[] {
   return pools.map((pool) => buildPool(pool))
 }
 

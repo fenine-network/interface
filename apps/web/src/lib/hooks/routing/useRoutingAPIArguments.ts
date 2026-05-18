@@ -1,5 +1,5 @@
 import { SkipToken, skipToken } from '@reduxjs/toolkit/query/react'
-import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
+import { Currency, CurrencyAmount, TradeType } from '@fenine/sdk-core'
 import { useUniswapXSyntheticQuoteEnabled } from 'featureFlags/flags/uniswapXUseSyntheticQuote'
 import { useFeesEnabled } from 'featureFlags/flags/useFees'
 import { useMemo } from 'react'

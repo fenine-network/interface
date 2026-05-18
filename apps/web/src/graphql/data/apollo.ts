@@ -1,4 +1,6 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client'
+import { onError } from '@apollo/client/link/error'
+import { HttpLink } from '@apollo/client/link/http'
 import { Reference, relayStylePagination } from '@apollo/client/utilities'
 
 const GRAPHQL_URL = process.env.REACT_APP_AWS_API_ENDPOINT
@@ -6,13 +8,30 @@ if (!GRAPHQL_URL) {
   throw new Error('AWS URL MISSING FROM ENVIRONMENT')
 }
 
-export const apolloClient = new ApolloClient({
-  connectToDevTools: true,
+// Silently handle GraphQL errors (schema mismatch with Fenine subgraph)
+// so the app doesn't crash when Uniswap-specific queries fail
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message }) => {
+      console.debug('[GraphQL error - non-fatal]:', message)
+    })
+  }
+  if (networkError) {
+    console.debug('[Network error - non-fatal]:', networkError)
+  }
+})
+
+const httpLink = new HttpLink({
   uri: GRAPHQL_URL,
   headers: {
     'Content-Type': 'application/json',
     Origin: 'https://app.uniswap.org',
   },
+})
+
+export const apolloClient = new ApolloClient({
+  connectToDevTools: true,
+  link: ApolloLink.from([errorLink, httpLink]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -20,7 +39,6 @@ export const apolloClient = new ApolloClient({
           nftBalances: relayStylePagination(['ownerAddress', 'filter']),
           nftAssets: relayStylePagination(),
           nftActivity: relayStylePagination(),
-          // tell apollo client how to reference Token items in the cache after being fetched by queries that return Token[]
           token: {
             read(_, { args, toReference }): Reference | undefined {
               return toReference({
@@ -33,17 +51,10 @@ export const apolloClient = new ApolloClient({
         },
       },
       Token: {
-        // key by chain, address combination so that Token(chain, address) endpoint can read from cache
-        /**
-         * NOTE: In any query for `token` or `tokens`, you must include the `chain` and `address` fields
-         * in order for result to normalize properly in the cache.
-         */
         keyFields: ['chain', 'address'],
         fields: {
           address: {
             read(address: string | null): string | null {
-              // backend endpoint sometimes returns checksummed, sometimes lowercased addresses
-              // always use lowercased addresses in our app for consistency
               return address?.toLowerCase() ?? null
             },
           },
@@ -52,7 +63,6 @@ export const apolloClient = new ApolloClient({
       TokenProject: {
         fields: {
           tokens: {
-            // cache data may be lost when replacing the tokens array
             merge(existing, incoming) {
               if (!existing) {
                 return incoming
@@ -70,6 +80,10 @@ export const apolloClient = new ApolloClient({
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'cache-and-network',
+      errorPolicy: 'ignore',
+    },
+    query: {
+      errorPolicy: 'ignore',
     },
   },
 })

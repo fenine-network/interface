@@ -1,4 +1,4 @@
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 import { getChainInfo } from 'constants/chainInfo'
 import { isSupportedChain, SupportedInterfaceChain } from 'constants/chains'
 import { CSSProperties, FunctionComponent } from 'react'
@@ -12,6 +12,7 @@ import { ReactComponent as bnb } from './ChainSymbols/bnb.svg'
 import { ReactComponent as celo } from './ChainSymbols/celo.svg'
 import { ReactComponent as celoLight } from './ChainSymbols/celo_light.svg'
 import { ReactComponent as ethereum } from './ChainSymbols/ethereum.svg'
+import { ReactComponent as fenine } from './ChainSymbols/fenine.svg'
 import { ReactComponent as optimism } from './ChainSymbols/optimism.svg'
 import { ReactComponent as polygon } from './ChainSymbols/polygon.svg'
 
@@ -21,6 +22,12 @@ type ChainUI = { Symbol: SVG; bgColor: string; textColor: string }
 export function getChainUI(chainId: SupportedInterfaceChain, darkMode: boolean): ChainUI
 export function getChainUI(chainId: ChainId, darkMode: boolean): ChainUI | undefined {
   switch (chainId) {
+    case ChainId.FENINE:
+      return {
+        Symbol: fenine,
+        bgColor: '#FF6B3533',
+        textColor: '#FF6B35',
+      }
     case ChainId.MAINNET:
     case ChainId.GOERLI:
     case ChainId.SEPOLIA:

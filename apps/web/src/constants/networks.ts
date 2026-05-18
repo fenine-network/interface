@@ -1,4 +1,4 @@
-import { ChainId } from '@uniswap/sdk-core'
+import { ChainId } from '@fenine/sdk-core'
 
 const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
 if (typeof INFURA_KEY === 'undefined') {
@@ -24,6 +24,9 @@ if (typeof QUICKNODE_BNB_RPC_URL === 'undefined') {
  * These "Safe" URLs are listed first, followed by other fallback URLs, which are taken from chainlist.org.
  */
 export const FALLBACK_URLS = {
+  [ChainId.FENINE]: [
+    'https://rpc.fene.app',
+  ],
   [ChainId.MAINNET]: [
     // "Safe" URLs
     'https://api.mycryptoapi.com/eth',
@@ -126,6 +129,7 @@ export const FALLBACK_URLS = {
  * These are the URLs used by the interface when there is not another available source of chain data.
  */
 export const RPC_URLS = {
+  [ChainId.FENINE]: ['https://rpc.fene.app'],
   [ChainId.MAINNET]: [
     `https://mainnet.infura.io/v3/${INFURA_KEY}`,
     QUICKNODE_MAINNET_RPC_URL,

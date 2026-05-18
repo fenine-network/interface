@@ -1,5 +1,5 @@
 import { InterfaceEventName } from '@uniswap/analytics-events'
-import { Currency, Percent } from '@uniswap/sdk-core'
+import { Currency, Percent } from '@fenine/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import { sendAnalyticsEvent, useTrace } from 'analytics'
 import { ConfirmModalState } from 'components/swap/ConfirmSwapModal'
@@ -222,8 +222,8 @@ export function useConfirmModalState({
   const [lastExecutionPrice, setLastExecutionPrice] = useState(trade?.executionPrice)
   const [priceUpdate, setPriceUpdate] = useState<number>()
   useEffect(() => {
-    if (lastExecutionPrice && !trade.executionPrice.equalTo(lastExecutionPrice)) {
-      setPriceUpdate(getPriceUpdateBasisPoints(lastExecutionPrice, trade.executionPrice))
+    if (lastExecutionPrice && !trade.executionPrice.equalTo(lastExecutionPrice as any)) {
+      setPriceUpdate(getPriceUpdateBasisPoints(lastExecutionPrice as any, trade.executionPrice as any))
       setLastExecutionPrice(trade.executionPrice)
     }
   }, [lastExecutionPrice, setLastExecutionPrice, trade])
