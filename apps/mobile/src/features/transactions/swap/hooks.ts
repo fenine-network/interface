@@ -2,10 +2,10 @@
 /* eslint-disable max-lines */
 import { MaxUint256 } from '@ethersproject/constants'
 import { SwapEventName } from '@uniswap/analytics-events'
-import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk'
-import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
-import { FlatFeeOptions, UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
-import { FeeOptions } from '@uniswap/v3-sdk'
+import { permit2Address } from '@fenine/permit2-sdk'
+import { Currency, CurrencyAmount, TradeType, ChainId as SdkChainId } from '@fenine/sdk-core'
+import { FlatFeeOptions, UNIVERSAL_ROUTER_ADDRESS, UniversalRouterVersion } from '@fenine/universal-router-sdk'
+import { FeeOptions } from '@fenine/v3-sdk'
 import { providers } from 'ethers'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnyAction } from 'redux'
@@ -84,6 +84,10 @@ import { DerivedSwapInfo } from './types'
 
 const NUM_DECIMALS_USD = 2
 const NUM_DECIMALS_DISPLAY = 2
+
+function getUniversalRouterVersion(chainId: ChainId): UniversalRouterVersion {
+  return chainId === SdkChainId.FENINE ? UniversalRouterVersion.V2_1_1 : UniversalRouterVersion.V1_2
+}
 
 /** Returns information derived from the current swap state */
 export function useDerivedSwapInfo(state: TransactionState): DerivedSwapInfo {
@@ -449,8 +453,9 @@ const getTokenPermit2ApprovalInfo = async (
     provider,
     ERC20_ABI
   )
+  const currentPermit2Address = permit2Address(chainId)
 
-  const allowance = await tokenContract.callStatic.allowance(address, PERMIT2_ADDRESS)
+  const allowance = await tokenContract.callStatic.allowance(address, currentPermit2Address)
   if (!allowance.lt(currencyInAmountRaw)) {
     return { action: ApprovalAction.None, txRequest: null }
   }
@@ -458,7 +463,7 @@ const getTokenPermit2ApprovalInfo = async (
   let baseTransaction
   try {
     baseTransaction = await tokenContract.populateTransaction.approve(
-      PERMIT2_ADDRESS,
+      currentPermit2Address,
       // max approve on Permit2 since this method costs gas and we don't want users
       // to have to pay approval gas on every tx
       MAX_APPROVE_AMOUNT,
@@ -467,7 +472,7 @@ const getTokenPermit2ApprovalInfo = async (
   } catch {
     // above call errors when token restricts max approvals
     baseTransaction = await tokenContract.populateTransaction.approve(
-      PERMIT2_ADDRESS,
+      currentPermit2Address,
       currencyInAmountRaw,
       { from: address }
     )
@@ -546,7 +551,7 @@ function useSwapTransactionRequest(
 
     const transactionRequest = {
       from: address,
-      to: UNIVERSAL_ROUTER_ADDRESS(chainId),
+      to: UNIVERSAL_ROUTER_ADDRESS(getUniversalRouterVersion(chainId), chainId),
       gasLimit,
       chainId,
       data: calldata,

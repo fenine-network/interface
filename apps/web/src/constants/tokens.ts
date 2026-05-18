@@ -1,4 +1,4 @@
-import { ChainId, Currency, Ether, NativeCurrency, Token, UNI_ADDRESSES, WETH9 } from '@uniswap/sdk-core'
+import { ChainId, Currency, Ether, NativeCurrency, Token, UNI_ADDRESSES, WETH9 } from '@fenine/sdk-core'
 import invariant from 'tiny-invariant'
 
 export const NATIVE_CHAIN_ID = 'NATIVE'
@@ -67,6 +67,13 @@ export const PORTAL_USDC_CELO = new Token(
   'USDC (Portal from Ethereum)'
 )
 export const USDC_BASE = new Token(ChainId.BASE, '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', 6, 'USDC', 'USD Coin')
+export const USDCE_FENINE = new Token(
+  ChainId.FENINE,
+  '0x09F7D800848E6c6e3F1E404Df9AEfe070C642bA4',
+  6,
+  'USDC.e',
+  'USD Coin (Bridged)'
+)
 
 export const DAI = new Token(ChainId.MAINNET, '0x6B175474E89094C44Da98b954EedeAC495271d0F', 18, 'DAI', 'Dai Stablecoin')
 export const DAI_ARBITRUM_ONE = new Token(
@@ -273,6 +280,13 @@ export const MNW = new Token(
 
 export const WRAPPED_NATIVE_CURRENCY: { [chainId: number]: Token | undefined } = {
   ...(WETH9 as Record<ChainId, Token>),
+  [ChainId.FENINE]: new Token(
+    ChainId.FENINE,
+    '0x6F895942C4C6B557aBA977903e0efB341Bc7483A',
+    18,
+    'WFEN',
+    'Wrapped Fenine'
+  ),
   [ChainId.OPTIMISM]: new Token(
     ChainId.OPTIMISM,
     '0x4200000000000000000000000000000000000006',
@@ -428,6 +442,28 @@ class AvaxNativeCurrency extends NativeCurrency {
   }
 }
 
+export function isFenine(chainId: number): chainId is ChainId.FENINE {
+  return chainId === ChainId.FENINE
+}
+
+class FenineNativeCurrency extends NativeCurrency {
+  equals(other: Currency): boolean {
+    return other.isNative && other.chainId === this.chainId
+  }
+
+  get wrapped(): Token {
+    if (!isFenine(this.chainId)) throw new Error('Not Fenine')
+    const wrapped = WRAPPED_NATIVE_CURRENCY[this.chainId]
+    invariant(wrapped instanceof Token)
+    return wrapped
+  }
+
+  public constructor(chainId: number) {
+    if (!isFenine(chainId)) throw new Error('Not Fenine')
+    super(chainId, 18, 'FEN', 'Fenine')
+  }
+}
+
 class ExtendedEther extends Ether {
   public get wrapped(): Token {
     const wrapped = WRAPPED_NATIVE_CURRENCY[this.chainId]
@@ -446,7 +482,9 @@ const cachedNativeCurrency: { [chainId: number]: NativeCurrency | Token } = {}
 export function nativeOnChain(chainId: number): NativeCurrency | Token {
   if (cachedNativeCurrency[chainId]) return cachedNativeCurrency[chainId]
   let nativeCurrency: NativeCurrency | Token
-  if (isPolygon(chainId)) {
+  if (isFenine(chainId)) {
+    nativeCurrency = new FenineNativeCurrency(chainId)
+  } else if (isPolygon(chainId)) {
     nativeCurrency = new PolygonNativeCurrency(chainId)
   } else if (isCelo(chainId)) {
     nativeCurrency = getCeloNativeCurrency(chainId)

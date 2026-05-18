@@ -1,13 +1,14 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { t } from '@lingui/macro'
 import { CustomUserProperties, SwapEventName } from '@uniswap/analytics-events'
-import { Percent } from '@uniswap/sdk-core'
-import { FlatFeeOptions, SwapRouter, UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
-import { FeeOptions, toHex } from '@uniswap/v3-sdk'
+import { Percent } from '@fenine/sdk-core'
+import { FlatFeeOptions, SwapRouter, TokenTransferMode, UniversalRouterVersion } from '@fenine/universal-router-sdk'
+import { FeeOptions, toHex } from '@fenine/v3-sdk'
 import { useWeb3React } from '@web3-react/core'
 import { sendAnalyticsEvent, useTrace } from 'analytics'
 import { useCachedPortfolioBalancesQuery } from 'components/PrefetchBalancesWrapper/PrefetchBalancesWrapper'
 import { getConnection } from 'connection'
+import { getUniversalRouterAddress } from 'constants/addresses'
 import useBlockNumber from 'lib/hooks/useBlockNumber'
 import { formatCommonPropertiesForTrade, formatSwapSignedAnalyticsEventProperties } from 'lib/utils/analytics'
 import { useCallback } from 'react'
@@ -73,17 +74,20 @@ export function useUniversalRouterSwapCallback(
 
         setTraceData('slippageTolerance', options.slippageTolerance.toFixed(2))
 
-        const { calldata: data, value } = SwapRouter.swapERC20CallParameters(trade, {
+        const { calldata: data, value } = SwapRouter.swapCallParameters(trade, {
           slippageTolerance: options.slippageTolerance,
           deadlineOrPreviousBlockhash: options.deadline?.toString(),
           inputTokenPermit: options.permit,
           fee: options.feeOptions,
           flatFee: options.flatFeeOptions,
+          urVersion: chainId === 920 ? UniversalRouterVersion.V2_1_1 : UniversalRouterVersion.V1_2,
+          tokenTransferMode: TokenTransferMode.Permit2,
+          chainId,
         })
 
         const tx = {
           from: account,
-          to: UNIVERSAL_ROUTER_ADDRESS(chainId),
+          to: getUniversalRouterAddress(chainId) ?? '',
           data,
           // TODO(https://github.com/Uniswap/universal-router-sdk/issues/113): universal-router-sdk returns a non-hexlified value.
           ...(value && !isZero(value) ? { value: toHex(value) } : {}),

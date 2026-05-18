@@ -2,11 +2,11 @@ import {
   AllowanceProvider,
   AllowanceTransfer,
   MaxUint160,
-  PERMIT2_ADDRESS,
   PermitSingle,
-} from '@uniswap/permit2-sdk'
-import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
-import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
+  permit2Address,
+} from '@fenine/permit2-sdk'
+import { Currency, CurrencyAmount } from '@fenine/sdk-core'
+import { UNIVERSAL_ROUTER_ADDRESS, UniversalRouterVersion } from '@fenine/universal-router-sdk'
 import dayjs from 'dayjs'
 import { BigNumber, providers } from 'ethers'
 import { useCallback } from 'react'
@@ -21,6 +21,11 @@ import { SignerManager } from 'wallet/src/features/wallet/signing/SignerManager'
 import { signTypedData } from 'wallet/src/features/wallet/signing/signing'
 
 const PERMIT2_SIG_VALIDITY_TIME = 30 // minutes
+
+function getUniversalRouterVersion(chainId: ChainId): UniversalRouterVersion {
+  return chainId === ChainId.Fenine ? UniversalRouterVersion.V2_1_1 : UniversalRouterVersion.V1_2
+}
+
 function getPermitStruct(
   tokenAddress: string,
   nonce: number,
@@ -68,8 +73,9 @@ async function getPermit2PermitSignature(
     }
 
     const user = account.address
-    const allowanceProvider = new AllowanceProvider(provider, PERMIT2_ADDRESS)
-    const universalRouterAddress = UNIVERSAL_ROUTER_ADDRESS(chainId)
+    const currentPermit2Address = permit2Address(chainId)
+    const allowanceProvider = new AllowanceProvider(provider, currentPermit2Address)
+    const universalRouterAddress = UNIVERSAL_ROUTER_ADDRESS(getUniversalRouterVersion(chainId), chainId)
     const {
       amount: permitAmount,
       expiration,
@@ -83,7 +89,7 @@ async function getPermit2PermitSignature(
     const permitMessage = getPermitStruct(tokenAddress, nonce, universalRouterAddress)
     const { domain, types, values } = AllowanceTransfer.getPermitData(
       permitMessage,
-      PERMIT2_ADDRESS,
+      currentPermit2Address,
       chainId
     )
 
