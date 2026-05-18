@@ -1,5 +1,5 @@
-import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
-import { Route } from '@uniswap/v3-sdk'
+import { Currency, CurrencyAmount, TradeType } from '@fenine/sdk-core'
+import { Route } from '@fenine/v3-sdk'
 import { getWrapType, requireAcceptNewTrade } from 'src/features/transactions/swap/utils'
 import { ChainId } from 'wallet/src/constants/chains'
 import { UNI, WBTC, wrappedNativeCurrency } from 'wallet/src/constants/tokens'

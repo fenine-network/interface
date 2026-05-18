@@ -1,4 +1,4 @@
-import { ADDRESS_ZERO } from '@uniswap/v3-sdk'
+import { ADDRESS_ZERO } from '@fenine/v3-sdk'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Keyboard } from 'react-native'

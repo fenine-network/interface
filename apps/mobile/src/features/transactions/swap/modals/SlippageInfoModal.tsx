@@ -1,4 +1,4 @@
-import { Currency, TradeType } from '@uniswap/sdk-core'
+import { Currency, TradeType } from '@fenine/sdk-core'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomSheetModal } from 'src/components/modals/BottomSheetModal'

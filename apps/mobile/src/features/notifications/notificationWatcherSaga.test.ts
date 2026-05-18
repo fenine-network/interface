@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core'
+import { TradeType } from '@fenine/sdk-core'
 import { expectSaga } from 'redux-saga-test-plan'
 import { pushTransactionNotification } from 'src/features/notifications/notificationWatcherSaga'
 import { getNativeAddress } from 'wallet/src/constants/addresses'

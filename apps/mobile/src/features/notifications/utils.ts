@@ -1,4 +1,4 @@
-import { Currency, TradeType } from '@uniswap/sdk-core'
+import { Currency, TradeType } from '@fenine/sdk-core'
 import { CHAIN_INFO } from 'wallet/src/constants/chains'
 import { toSupportedChainId } from 'wallet/src/features/chains/utils'
 import { LocalizationContextState } from 'wallet/src/features/language/LocalizationContext'

@@ -1,11 +1,11 @@
-import { Protocol } from '@uniswap/router-sdk'
-import { Currency, Percent, TradeType } from '@uniswap/sdk-core'
+import { Protocol } from '@fenine/router-sdk'
+import { Currency, Percent, TradeType } from '@fenine/sdk-core'
 import {
   FlatFeeOptions,
   SwapOptions as UniversalRouterSwapOptions,
   SwapRouter as UniversalSwapRouter,
-} from '@uniswap/universal-router-sdk'
-import { FeeOptions } from '@uniswap/v3-sdk'
+} from '@fenine/universal-router-sdk'
+import { FeeOptions } from '@fenine/v3-sdk'
 import { BigNumber } from 'ethers'
 import { ElementName } from 'src/features/telemetry/constants'
 import { AppTFunction } from 'ui/src/i18n/types'

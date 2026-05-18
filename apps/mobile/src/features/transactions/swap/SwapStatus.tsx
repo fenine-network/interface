@@ -1,4 +1,4 @@
-import { TradeType } from '@uniswap/sdk-core'
+import { TradeType } from '@fenine/sdk-core'
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelectTransaction } from 'src/features/transactions/hooks'
