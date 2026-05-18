@@ -1,4 +1,4 @@
-import { CurrencyAmount } from '@uniswap/sdk-core'
+import { CurrencyAmount } from '@fenine/sdk-core'
 import { hasSufficientFundsIncludingGas, isOffline } from 'wallet/src/features/transactions/utils'
 import { ETH, networkDown, networkUnknown, networkUp } from 'wallet/src/test/fixtures'
 

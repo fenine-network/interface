@@ -1,4 +1,4 @@
-import { Currency } from '@uniswap/sdk-core'
+import { Currency } from '@fenine/sdk-core'
 import { LocalizationContextState } from 'wallet/src/features/language/LocalizationContext'
 import { getValidAddress, shortenAddress } from 'wallet/src/utils/addresses'
 import { getCurrencyAmount, ValueType } from 'wallet/src/utils/getCurrencyAmount'

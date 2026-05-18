@@ -5,9 +5,9 @@ import {
   NetInfoStateType,
   NetInfoUnknownState,
 } from '@react-native-community/netinfo'
-import { TradeType } from '@uniswap/sdk-core'
-import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
-import { FeeAmount, Pool } from '@uniswap/v3-sdk'
+import { TradeType } from '@fenine/sdk-core'
+import { UNIVERSAL_ROUTER_ADDRESS } from '@fenine/universal-router-sdk'
+import { FeeAmount, Pool } from '@fenine/v3-sdk'
 import { BigNumber, providers } from 'ethers'
 import ERC20_ABI from 'wallet/src/abis/erc20.json'
 import { Erc20, Weth } from 'wallet/src/abis/types'

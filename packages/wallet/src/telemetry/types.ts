@@ -1,5 +1,5 @@
 import { MoonpayEventName, SwapEventName } from '@uniswap/analytics-events'
-import { Protocol } from '@uniswap/router-sdk'
+import { Protocol } from '@fenine/router-sdk'
 import { TraceProps } from 'utilities/src/telemetry/trace/Trace'
 import { ChainId } from 'wallet/src/constants/chains'
 import { ImportType } from 'wallet/src/features/onboarding/types'

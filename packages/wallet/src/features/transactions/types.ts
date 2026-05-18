@@ -1,5 +1,5 @@
-import { Protocol } from '@uniswap/router-sdk'
-import { TradeType } from '@uniswap/sdk-core'
+import { Protocol } from '@fenine/router-sdk'
+import { TradeType } from '@fenine/sdk-core'
 import { providers } from 'ethers'
 import { ChainId } from 'wallet/src/constants/chains'
 import { TransactionListQuery } from 'wallet/src/data/__generated__/types-and-hooks'
