@@ -6,7 +6,7 @@ const { readFileSync } = require('fs')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
-const { IgnorePlugin, ProvidePlugin } = require('webpack')
+const { IgnorePlugin, ProvidePlugin, DefinePlugin } = require('webpack')
 const { RetryChunkLoadPlugin } = require('webpack-retry-chunk-load-plugin')
 
 const commitHash = execSync('git rev-parse HEAD').toString().trim()
@@ -70,6 +70,12 @@ module.exports = {
       new ProvidePlugin({
         // - react-markdown requires process.cwd
         process: 'process/browser.js',
+        // - @fenine/smart-order-router uses Buffer
+        Buffer: ['buffer', 'Buffer'],
+      }),
+      // Define globals that smart-order-router expects in Node.js but not in browser
+      new DefinePlugin({
+        'Browser': 'undefined',
       }),
       new VanillaExtractPlugin(),
       new RetryChunkLoadPlugin({
@@ -128,6 +134,18 @@ module.exports = {
         fallback: {
           // - react-markdown requires path
           path: require.resolve('path-browserify'),
+          // - @fenine/smart-order-router (tenderly-simulation-provider) uses http/https
+          // - brotli uses fs
+          // We don't need these in the browser, so use empty modules
+          http: false,
+          https: false,
+          fs: false,
+          stream: false,
+          crypto: false,
+          os: false,
+          net: false,
+          tls: false,
+          zlib: false,
         },
       })
 
