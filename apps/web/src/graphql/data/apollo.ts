@@ -3,16 +3,7 @@ import { onError } from '@apollo/client/link/error'
 import { HttpLink } from '@apollo/client/link/http'
 import { Reference, relayStylePagination } from '@apollo/client/utilities'
 
-const CONFIGURED_GRAPHQL_URL = process.env.REACT_APP_AWS_API_ENDPOINT
-if (!CONFIGURED_GRAPHQL_URL) {
-  throw new Error('AWS URL MISSING FROM ENVIRONMENT')
-}
-
-const HOSTED_FENINE_SUBGRAPH_URL = 'https://subgraph.fene.app/subgraphs/name/uniswap-v3-fenine'
-
-const GRAPHQL_URL = CONFIGURED_GRAPHQL_URL.startsWith('http://')
-  ? HOSTED_FENINE_SUBGRAPH_URL
-  : CONFIGURED_GRAPHQL_URL
+const GRAPHQL_URL = '/api/subgraph'
 
 // Silently handle GraphQL errors (schema mismatch with Fenine subgraph)
 // so the app doesn't crash when Uniswap-specific queries fail
@@ -31,7 +22,6 @@ const httpLink = new HttpLink({
   uri: GRAPHQL_URL,
   headers: {
     'Content-Type': 'application/json',
-    Origin: 'https://app.uniswap.org',
   },
 })
 
