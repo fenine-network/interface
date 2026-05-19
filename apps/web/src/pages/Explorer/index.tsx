@@ -3,7 +3,7 @@ import { ChainId } from '@fenine/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import AssetLogo from 'components/Logo/AssetLogo'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { ArrowUpRight, Search } from 'react-feather'
+import { ArrowUpRight } from 'react-feather'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ExternalLink, ThemedText } from 'theme/components'
@@ -16,12 +16,22 @@ const DEFAULT_PAGE_SIZE = 25
 const DETAIL_POOL_PAGE_SIZE = 20
 const DETAIL_TOKEN_POOL_PAGE_SIZE = 12
 const DETAIL_TOKEN_SWAP_PAGE_SIZE = 20
+const SUMMARY_POOL_LIMIT = 1000
+const SUMMARY_SWAP_LIMIT = 1000
 
 enum ExplorerTab {
   Activity = 'activity',
   Pairs = 'pairs',
   Tokens = 'tokens',
   Wallet = 'wallet',
+}
+
+enum VolumeRange {
+  H1 = '1h',
+  D1 = '1d',
+  W1 = '1w',
+  M1 = '1m',
+  Y1 = '1y',
 }
 
 type ExplorerToken = {
@@ -78,6 +88,11 @@ type ActivityQueryResult = {
     }
   }
   swaps: ExplorerSwap[]
+}
+
+type ExplorerSummaryQueryResult = {
+  pools: Pick<ExplorerPool, 'id' | 'totalValueLockedUSD'>[]
+  swaps: Pick<ExplorerSwap, 'id' | 'amountUSD' | 'origin'>[]
 }
 
 type PoolsQueryResult = {
@@ -180,6 +195,20 @@ const EXPLORER_POOLS_QUERY = gql`
         symbol
         name
       }
+    }
+  }
+`
+
+const EXPLORER_SUMMARY_QUERY = gql`
+  query ExplorerSummary($firstPools: Int!, $firstSwaps: Int!, $timestampGte: BigInt!) {
+    pools(first: $firstPools, orderBy: totalValueLockedUSD, orderDirection: desc) {
+      id
+      totalValueLockedUSD
+    }
+    swaps(first: $firstSwaps, where: { timestamp_gte: $timestampGte }, orderBy: timestamp, orderDirection: desc) {
+      id
+      amountUSD
+      origin
     }
   }
 `
@@ -531,6 +560,25 @@ const TabButton = styled.button<{ active: boolean }>`
   transition: all ${({ theme }) => `${theme.transition.duration.fast} ${theme.transition.timing.ease}`};
 `
 
+const RangeButtonGroup = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`
+
+const RangeButton = styled.button<{ active: boolean }>`
+  border: 1px solid ${({ theme, active }) => (active ? theme.accent1 : theme.surface3)};
+  background: ${({ theme, active }) => (active ? theme.accent1 : theme.surface1)};
+  color: ${({ theme, active }) => (active ? theme.accent2 : theme.neutral2)};
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all ${({ theme }) => `${theme.transition.duration.fast} ${theme.transition.timing.ease}`};
+`
+
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -772,6 +820,63 @@ function formatTimestamp(timestamp: string) {
     day: '2-digit',
     year: 'numeric',
   }).format(new Date(Number(timestamp) * 1000))
+}
+
+function getVolumeRangeLabel(range: VolumeRange) {
+  switch (range) {
+    case VolumeRange.H1:
+      return '1H'
+    case VolumeRange.D1:
+      return '1D'
+    case VolumeRange.W1:
+      return '1W'
+    case VolumeRange.M1:
+      return '1M'
+    case VolumeRange.Y1:
+      return '1Y'
+  }
+}
+
+function getVolumeRangeSeconds(range: VolumeRange) {
+  switch (range) {
+    case VolumeRange.H1:
+      return 60 * 60
+    case VolumeRange.D1:
+      return 60 * 60 * 24
+    case VolumeRange.W1:
+      return 60 * 60 * 24 * 7
+    case VolumeRange.M1:
+      return 60 * 60 * 24 * 30
+    case VolumeRange.Y1:
+      return 60 * 60 * 24 * 365
+  }
+}
+
+function formatUsdCompactEnglish(input: number) {
+  if (!Number.isFinite(input)) {
+    return '-'
+  }
+
+  if (input === 0) {
+    return '-'
+  }
+
+  if (Math.abs(input) < 1000) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }).format(input)
+  }
+
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+  }).format(input)
 }
 
 function dedupePools(pools: ExplorerPool[]) {
@@ -1398,6 +1503,7 @@ export default function ExplorerPage() {
   const [pairsPage, setPairsPage] = useState(1)
   const [tokensPage, setTokensPage] = useState(1)
   const [walletPage, setWalletPage] = useState(1)
+  const [volumeRange, setVolumeRange] = useState<VolumeRange>(VolumeRange.D1)
   const { formatNumber } = useFormatter()
 
   const activeTab = useMemo<ExplorerTab>(() => {
@@ -1432,6 +1538,21 @@ export default function ExplorerPage() {
     fetchPolicy: 'no-cache',
   })
 
+  const summaryTimestampGte = useMemo(
+    () => Math.floor(Date.now() / 1000) - getVolumeRangeSeconds(volumeRange),
+    [volumeRange]
+  )
+
+  const { data: summaryData, loading: summaryLoading } = useQuery<ExplorerSummaryQueryResult>(EXPLORER_SUMMARY_QUERY, {
+    variables: {
+      firstPools: SUMMARY_POOL_LIMIT,
+      firstSwaps: SUMMARY_SWAP_LIMIT,
+      timestampGte: summaryTimestampGte,
+    },
+    pollInterval: 60_000,
+    fetchPolicy: 'no-cache',
+  })
+
   const { data: tokensData, loading: tokensLoading } = useQuery<TokensQueryResult>(EXPLORER_TOKENS_QUERY, {
     variables: { first: DEFAULT_PAGE_SIZE, skip: (tokensPage - 1) * DEFAULT_PAGE_SIZE },
     pollInterval: 60_000,
@@ -1458,19 +1579,19 @@ export default function ExplorerPage() {
   const topPools = useMemo(() => poolsData?.pools ?? [], [poolsData?.pools])
   const topTokens = useMemo(() => tokensData?.tokens ?? [], [tokensData?.tokens])
   const walletSwaps = useMemo(() => walletData?.swaps ?? [], [walletData?.swaps])
+  const summaryPools = useMemo(() => summaryData?.pools ?? [], [summaryData?.pools])
+  const summarySwaps = useMemo(() => summaryData?.swaps ?? [], [summaryData?.swaps])
 
   const summary = useMemo(() => {
-    const uniqueWallets = new Set(recentSwaps.map((swap) => swap.origin.toLowerCase()))
-    const recentVolume = recentSwaps.reduce((total, swap) => total + parseAmount(swap.amountUSD), 0)
-    const totalTvl = topPools.reduce((total, pool) => total + parseAmount(pool.totalValueLockedUSD), 0)
+    const recentVolume = summarySwaps.reduce((total, swap) => total + parseAmount(swap.amountUSD), 0)
+    const totalTvl = summaryPools.reduce((total, pool) => total + parseAmount(pool.totalValueLockedUSD), 0)
     return {
-      recentSwaps: recentSwaps.length,
+      recentSwaps: summarySwaps.length,
       recentVolume,
-      activePools: topPools.length,
-      uniqueWallets: uniqueWallets.size,
+      activePools: summaryPools.length,
       totalTvl,
     }
-  }, [recentSwaps, topPools])
+  }, [summaryPools, summarySwaps])
 
   const renderContent = () => {
     if (poolAddress) {
@@ -1570,10 +1691,13 @@ export default function ExplorerPage() {
               Trace swaps, pools, tokens, and wallet activity directly from the Fenine subgraph.
             </ThemedText.BodySecondary>
           </div>
-          <Badge>
-            <Search size={12} />
-            Subgraph block #{activityData?._meta?.block?.number ?? '-'}
-          </Badge>
+          <RangeButtonGroup>
+            {Object.values(VolumeRange).map((range) => (
+              <RangeButton key={range} active={range === volumeRange} onClick={() => setVolumeRange(range)}>
+                {getVolumeRangeLabel(range)}
+              </RangeButton>
+            ))}
+          </RangeButtonGroup>
         </TitleRow>
       </Header>
 
@@ -1601,27 +1725,27 @@ export default function ExplorerPage() {
 
       <StatsGrid>
         <StatCard>
-          <ThemedText.LabelSmall>Recent swaps</ThemedText.LabelSmall>
+          <ThemedText.LabelSmall>Swaps ({getVolumeRangeLabel(volumeRange)})</ThemedText.LabelSmall>
           <ThemedText.HeadlineLarge>
-            {formatNumber({ input: summary.recentSwaps, type: NumberType.WholeNumber })}
+            {summaryLoading ? '-' : formatNumber({ input: summary.recentSwaps, type: NumberType.WholeNumber })}
           </ThemedText.HeadlineLarge>
         </StatCard>
         <StatCard>
-          <ThemedText.LabelSmall>Recent volume</ThemedText.LabelSmall>
+          <ThemedText.LabelSmall>Volume ({getVolumeRangeLabel(volumeRange)})</ThemedText.LabelSmall>
           <ThemedText.HeadlineLarge>
-            {formatNumber({ input: summary.recentVolume, type: NumberType.FiatTokenStats })}
+            {summaryLoading ? '-' : formatUsdCompactEnglish(summary.recentVolume)}
           </ThemedText.HeadlineLarge>
         </StatCard>
         <StatCard>
           <ThemedText.LabelSmall>Tracked pools</ThemedText.LabelSmall>
           <ThemedText.HeadlineLarge>
-            {formatNumber({ input: summary.activePools, type: NumberType.WholeNumber })}
+            {summaryLoading ? '-' : formatNumber({ input: summary.activePools, type: NumberType.WholeNumber })}
           </ThemedText.HeadlineLarge>
         </StatCard>
         <StatCard>
-          <ThemedText.LabelSmall>Unique wallets</ThemedText.LabelSmall>
+          <ThemedText.LabelSmall>Total TVL</ThemedText.LabelSmall>
           <ThemedText.HeadlineLarge>
-            {formatNumber({ input: summary.uniqueWallets, type: NumberType.WholeNumber })}
+            {summaryLoading ? '-' : formatUsdCompactEnglish(summary.totalTvl)}
           </ThemedText.HeadlineLarge>
         </StatCard>
       </StatsGrid>
