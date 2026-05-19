@@ -23,11 +23,17 @@ export function getChainUI(chainId: SupportedInterfaceChain, darkMode: boolean):
 export function getChainUI(chainId: ChainId, darkMode: boolean): ChainUI | undefined {
   switch (chainId) {
     case ChainId.FENINE:
-      return {
-        Symbol: fenine,
-        bgColor: '#FF6B3533',
-        textColor: '#FF6B35',
-      }
+      return darkMode
+        ? {
+            Symbol: fenine,
+            bgColor: '#faf7e333',
+            textColor: '#faf7e3',
+          }
+        : {
+            Symbol: fenine,
+            bgColor: '#133e5220',
+            textColor: '#133e52',
+          }
     case ChainId.MAINNET:
     case ChainId.GOERLI:
     case ChainId.SEPOLIA:
@@ -117,13 +123,13 @@ export function ChainLogo({
   if (!isSupportedChain(chainId)) return null
   const { label } = getChainInfo(chainId)
 
-  const { Symbol, bgColor } = getChainUI(chainId, darkMode)
+  const { Symbol, bgColor, textColor } = getChainUI(chainId, darkMode)
   return (
     <svg width={size} height={size} className={className} style={style} aria-labelledby="titleID" data-testid={testId}>
       <title id="titleID">{`${label} logo`}</title>
       <rect rx={borderRadius} fill={surface2} width={size} height={size} />
       <rect rx={borderRadius} fill={bgColor} width={size} height={size} />
-      <Symbol width={size} height={size} />
+      <Symbol width={size} height={size} style={{ color: textColor }} />
     </svg>
   )
 }

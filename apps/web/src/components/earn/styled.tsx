@@ -1,12 +1,11 @@
 import styled from 'styled-components'
 
-import uImage from '../../assets/images/big_unicorn.png'
 import noise from '../../assets/images/noise.png'
-import xlUnicorn from '../../assets/images/xl_uni.png'
+import fenineMark from '../../assets/svg/logo.svg'
 import { AutoColumn } from '../Column'
 
 export const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff007a 0%, #2172e5 100%);
+  background: linear-gradient(135deg, rgba(250, 247, 227, 0.18) 0%, rgba(19, 62, 82, 0.78) 100%);
   border-radius: 12px;
   width: 100%;
   position: relative;
@@ -14,7 +13,9 @@ export const DataCard = styled(AutoColumn)<{ disabled?: boolean }>`
 `
 
 export const CardBGImage = styled.span<{ desaturate?: boolean }>`
-  background: url(${uImage});
+  background: url(${fenineMark});
+  background-repeat: no-repeat;
+  background-size: contain;
   width: 1000px;
   height: 600px;
   position: absolute;
@@ -28,7 +29,9 @@ export const CardBGImage = styled.span<{ desaturate?: boolean }>`
 `
 
 export const CardBGImageSmaller = styled.span<{ desaturate?: boolean }>`
-  background: url(${xlUnicorn});
+  background: url(${fenineMark});
+  background-repeat: no-repeat;
+  background-size: contain;
   width: 1200px;
   height: 1200px;
   position: absolute;
@@ -63,6 +66,6 @@ export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
 
 export const Break = styled.div`
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(250, 247, 227, 0.2);
   height: 1px;
 `

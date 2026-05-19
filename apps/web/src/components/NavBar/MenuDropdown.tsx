@@ -1,5 +1,4 @@
 import { t, Trans } from '@lingui/macro'
-import { InterfaceElementName } from '@uniswap/analytics-events'
 import FeatureFlagModal from 'components/FeatureFlagModal/FeatureFlagModal'
 import { PrivacyPolicyModal } from 'components/PrivacyPolicy'
 import { useOnClickOutside } from 'hooks/useOnClickOutside'
@@ -22,9 +21,8 @@ import { useToggleModal } from 'state/application/hooks'
 import styled, { useTheme } from 'styled-components'
 import { ThemedText } from 'theme/components'
 import { isDevelopmentEnv, isStagingEnv } from 'utils/env'
-import { openDownloadApp } from 'utils/openDownloadApp'
 
-import { ReactComponent as UniswapAppLogo } from '../../assets/svg/uniswap_app_logo.svg'
+import { ReactComponent as FenswapLogo } from '../../assets/svg/logo.svg'
 import { ApplicationModal } from '../../state/application/reducer'
 import * as styles from './MenuDropdown.css'
 import { NavDropdown } from './NavDropdown'
@@ -159,7 +157,7 @@ export const MenuDropdown = () => {
                     <Trans>Vote in governance</Trans>
                   </PrimaryMenuRow.Text>
                 </PrimaryMenuRow>
-                <PrimaryMenuRow href="https://info.uniswap.org/#/">
+                <PrimaryMenuRow href="https://swap.fene.app/analytics">
                   <Icon>
                     <BarChartIcon width={24} height={24} color={theme.neutral1} />
                   </Icon>
@@ -167,29 +165,21 @@ export const MenuDropdown = () => {
                     <Trans>View more analytics</Trans>
                   </PrimaryMenuRow.Text>
                 </PrimaryMenuRow>
-                <Box
-                  onClick={() =>
-                    openDownloadApp({
-                      element: InterfaceElementName.UNISWAP_WALLET_NAVBAR_MENU_DOWNLOAD_BUTTON,
-                    })
-                  }
-                >
-                  <PrimaryMenuRow close={toggleOpen}>
-                    <>
-                      <Icon>
-                        <UniswapAppLogo width="24px" height="24px" />
-                      </Icon>
-                      <div>
-                        <ThemedText.BodyPrimary>
-                          <Trans>Download Uniswap</Trans>
-                        </ThemedText.BodyPrimary>
-                        <ThemedText.LabelSmall>
-                          <Trans>Available on iOS and Android</Trans>
-                        </ThemedText.LabelSmall>
-                      </div>
-                    </>
-                  </PrimaryMenuRow>
-                </Box>
+                <PrimaryMenuRow href="https://swap.fene.app">
+                  <>
+                    <Icon>
+                      <FenswapLogo width="24px" height="24px" />
+                    </Icon>
+                    <div>
+                      <ThemedText.BodyPrimary>
+                        <Trans>Open Fenswap</Trans>
+                      </ThemedText.BodyPrimary>
+                      <ThemedText.LabelSmall>
+                        <Trans>Trade on Fenine</Trans>
+                      </ThemedText.LabelSmall>
+                    </div>
+                  </>
+                </PrimaryMenuRow>
               </Column>
               <Separator />
               <Box
@@ -199,13 +189,13 @@ export const MenuDropdown = () => {
                 alignItems={{ sm: 'center', md: 'flex-start' }}
                 paddingX="8"
               >
-                <SecondaryLinkedText href="https://help.uniswap.org/en/">
+                <SecondaryLinkedText href="https://swap.fene.app/help">
                   <Trans>Help center</Trans> ↗
                 </SecondaryLinkedText>
-                <SecondaryLinkedText href="https://docs.uniswap.org/">
+                <SecondaryLinkedText href="https://swap.fene.app/docs">
                   <Trans>Documentation</Trans> ↗
                 </SecondaryLinkedText>
-                <SecondaryLinkedText href="https://uniswap.canny.io/feature-requests">
+                <SecondaryLinkedText href="https://swap.fene.app/feedback">
                   <Trans>Feedback</Trans> ↗
                 </SecondaryLinkedText>
                 <SecondaryLinkedText
@@ -231,10 +221,10 @@ export const MenuDropdown = () => {
                 <Icon href="https://discord.com/invite/FCfyBSbCU5">
                   <DiscordIconMenu className={styles.hover} width={24} height={24} color={themeVars.colors.neutral2} />
                 </Icon>
-                <Icon href="https://twitter.com/Uniswap">
+                <Icon href="https://swap.fene.app">
                   <TwitterIconMenu className={styles.hover} width={24} height={24} color={themeVars.colors.neutral2} />
                 </Icon>
-                <Icon href="https://github.com/Uniswap">
+                <Icon href="https://swap.fene.app">
                   <GithubIconMenu className={styles.hover} width={24} height={24} color={themeVars.colors.neutral2} />
                 </Icon>
               </IconRow>

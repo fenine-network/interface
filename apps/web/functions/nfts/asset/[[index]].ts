@@ -1,6 +1,5 @@
 /* eslint-disable import/no-unused-modules */
-import getAsset from '../../utils/getAsset'
-import { getMetadataRequest } from '../../utils/getRequest'
+import { handleNftAssetMetadataRequest } from '../../handlers'
 
 export const onRequest: PagesFunction = async ({ params, request, next }) => {
   const res = next()
@@ -8,8 +7,8 @@ export const onRequest: PagesFunction = async ({ params, request, next }) => {
     const { index } = params
     const collectionAddress = index[0]?.toString()
     const tokenId = index[1]?.toString()
-    return getMetadataRequest(res, request, () => getAsset(collectionAddress, tokenId, request.url))
-  } catch (e) {
+    return handleNftAssetMetadataRequest(request, res, collectionAddress, tokenId)
+  } catch {
     return res
   }
 }

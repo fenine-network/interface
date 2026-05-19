@@ -72,7 +72,7 @@ export const ButtonPrimary = styled(BaseButton)`
   font-size: 20px;
   font-weight: 535;
   padding: 16px;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.accent2};
   &:focus {
     box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.accent1)};
     background-color: ${({ theme }) => darken(0.05, theme.accent1)};
@@ -88,7 +88,7 @@ export const ButtonPrimary = styled(BaseButton)`
     background-color: ${({ theme, altDisabledStyle, disabled }) =>
       altDisabledStyle ? (disabled ? theme.accent1 : theme.surface3) : theme.surface3};
     color: ${({ altDisabledStyle, disabled, theme }) =>
-      altDisabledStyle ? (disabled ? theme.white : theme.neutral2) : theme.neutral2};
+      altDisabledStyle ? (disabled ? theme.accent2 : theme.neutral2) : theme.neutral2};
     cursor: auto;
     box-shadow: none;
     border: 1px solid transparent;

@@ -1,0 +1,14 @@
+/static/*
+  Cache-Control: public, max-age=31556952, immutable
+
+/asset-manifest.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+/manifest.json
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/favicon.ico
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/images/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

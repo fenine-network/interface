@@ -2,7 +2,7 @@ import { Trans } from '@lingui/macro'
 import { BrowserEvent, InterfaceElementName, InterfacePageName, SharedEventName } from '@uniswap/analytics-events'
 import { useWeb3React } from '@web3-react/core'
 import { Trace, TraceEvent } from 'analytics'
-import { ReactComponent as UniswapAppLogo } from 'assets/svg/uniswap_app_logo.svg'
+import { ReactComponent as FenineMark } from 'assets/svg/logo.svg'
 import { AboutFooter } from 'components/About/AboutFooter'
 import Card, { CardType } from 'components/About/Card'
 import { MAIN_CARDS, MORE_CARDS } from 'components/About/constants'
@@ -20,7 +20,6 @@ import { BREAKPOINTS } from 'theme'
 import { useIsDarkMode } from 'theme/components/ThemeToggle'
 import { TRANSITION_DURATIONS } from 'theme/styles'
 import { Z_INDEX } from 'theme/zIndex'
-import { getDownloadAppLinkProps } from 'utils/openDownloadApp'
 
 const PageContainer = styled.div`
   position: absolute;
@@ -46,10 +45,18 @@ const Gradient = styled.div<{ isDarkMode: boolean }>`
   ${({ isDarkMode }) =>
     isDarkMode
       ? css`
-          background: linear-gradient(rgba(8, 10, 24, 0) 0%, rgb(8 10 24 / 100%) 45%);
+          background: linear-gradient(
+            rgba(59, 60, 58, 0) 0%,
+            rgba(59, 60, 58, 0.82) 42%,
+            rgba(59, 60, 58, 0.98) 100%
+          );
         `
       : css`
-          background: linear-gradient(rgba(255, 255, 255, 0) 0%, rgb(255 255 255 /100%) 45%);
+          background: linear-gradient(
+            rgba(240, 237, 230, 0) 0%,
+            rgba(240, 237, 230, 0.88) 42%,
+            rgba(240, 237, 230, 1) 100%
+          );
         `};
   z-index: ${Z_INDEX.under_dropdown};
   pointer-events: none;
@@ -78,8 +85,10 @@ const Glow = styled.div`
   position: absolute;
   top: 68px;
   bottom: 0;
-  background: radial-gradient(72.04% 72.04% at 50% 3.99%, #ff37eb 0%, rgba(166, 151, 255, 0) 100%);
-  filter: blur(72px);
+  background:
+    radial-gradient(72.04% 72.04% at 50% 3.99%, rgba(250, 247, 227, 0.26) 0%, rgba(250, 247, 227, 0) 74%),
+    radial-gradient(58% 58% at 50% 18%, rgba(214, 207, 180, 0.18) 0%, rgba(214, 207, 180, 0) 100%);
+  filter: blur(84px);
   border-radius: 24px;
   max-width: 480px;
   width: 100%;
@@ -105,7 +114,7 @@ const ContentContainer = styled.div<{ isDarkMode: boolean }>`
   }
 `
 
-const DownloadWalletLink = styled.a`
+const EcosystemLink = styled.a`
   display: inline-flex;
   gap: 8px;
   margin-top: 24px;
@@ -122,6 +131,17 @@ const DownloadWalletLink = styled.a`
   }
 `
 
+const EcosystemMark = styled(FenineMark)<{ isDarkMode: boolean }>`
+  ${({ isDarkMode }) =>
+    isDarkMode
+      ? css`
+          filter: invert(95%) sepia(17%) saturate(404%) hue-rotate(327deg) brightness(103%) contrast(96%);
+        `
+      : css`
+          filter: invert(20%) sepia(33%) saturate(779%) hue-rotate(153deg) brightness(89%) contrast(86%);
+        `};
+`
+
 const TitleText = styled.h1<{ isDarkMode: boolean }>`
   color: transparent;
   font-size: 36px;
@@ -132,10 +152,10 @@ const TitleText = styled.h1<{ isDarkMode: boolean }>`
   ${({ isDarkMode }) =>
     isDarkMode
       ? css`
-          background: linear-gradient(20deg, rgba(255, 244, 207, 1) 10%, rgba(255, 87, 218, 1) 100%);
+          background: linear-gradient(18deg, #faf7e3 0%, #ddd7bf 100%);
         `
       : css`
-          background: linear-gradient(10deg, rgba(255, 79, 184, 1) 0%, rgba(255, 159, 251, 1) 100%);
+          background: linear-gradient(18deg, #133e52 0%, #365766 100%);
         `};
   background-clip: text;
   -webkit-background-clip: text;
@@ -177,13 +197,13 @@ const LandingButton = styled(BaseButton)`
 `
 
 const ButtonCTA = styled(LandingButton)`
-  background: linear-gradient(93.06deg, #ff00c7 2.66%, #ff9ffb 98.99%);
+  background: linear-gradient(135deg, #faf7e3 0%, #e3dcc3 100%);
   border: none;
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.accent2};
   transition: ${({ theme }) => `all ${theme.transition.duration.medium} ${theme.transition.timing.ease}`};
 
   &:hover {
-    box-shadow: 0px 0px 16px 0px #ff00c7;
+    box-shadow: 0px 18px 48px 0px rgba(250, 247, 227, 0.22);
   }
 `
 
@@ -234,10 +254,10 @@ const AboutContentContainer = styled.div<{ isDarkMode: boolean }>`
   ${({ isDarkMode }) =>
     isDarkMode
       ? css`
-          background: linear-gradient(179.82deg, rgba(0, 0, 0, 0) 0.16%, #050026 99.85%);
+          background: linear-gradient(180deg, rgba(59, 60, 58, 0) 0.16%, #31322f 99.85%);
         `
       : css`
-          background: linear-gradient(179.82deg, rgba(255, 255, 255, 0) 0.16%, #eaeaea 99.85%);
+          background: linear-gradient(180deg, rgba(240, 237, 230, 0) 0.16%, #ebe6d8 99.85%);
         `};
   @media screen and (min-width: ${BREAKPOINTS.md}px) {
     padding: 0 96px 5rem;
@@ -358,17 +378,17 @@ export default function Landing() {
         <ContentContainer isDarkMode={isDarkMode}>
           <TitleText isDarkMode={isDarkMode}>
             {shouldDisableNFTRoutes ? (
-              <Trans>Trade crypto with confidence</Trans>
+              <Trans>Trade on Fenswap with confidence</Trans>
             ) : (
-              <Trans>Trade crypto and NFTs with confidence</Trans>
+              <Trans>Trade on Fenswap with confidence</Trans>
             )}
           </TitleText>
           <SubTextContainer>
             <SubText>
               {shouldDisableNFTRoutes ? (
-                <Trans>Buy, sell, and explore tokens</Trans>
+                <Trans>Buy, sell, and explore tokens on Fenine</Trans>
               ) : (
-                <Trans>Buy, sell, and explore tokens and NFTs</Trans>
+                <Trans>Buy, sell, and explore tokens and NFTs on Fenine</Trans>
               )}
             </SubText>
           </SubTextContainer>
@@ -380,7 +400,7 @@ export default function Landing() {
             >
               <ButtonCTA as={Link} to="/swap">
                 <ButtonCTAText>
-                  <Trans>Get started</Trans>
+                  <Trans>Open Fenswap</Trans>
                 </ButtonCTAText>
               </ButtonCTA>
             </TraceEvent>
@@ -390,19 +410,15 @@ export default function Landing() {
               cardsRef?.current?.scrollIntoView({ behavior: 'smooth' })
             }}
           >
-            <Trans>Learn more</Trans>
+            <Trans>Explore more</Trans>
           </LearnMoreContainer>
 
-          <DownloadWalletLink
-            {...getDownloadAppLinkProps({
-              element: InterfaceElementName.UNISWAP_WALLET_LANDING_PAGE_DOWNLOAD_BUTTON,
-            })}
-          >
+          <EcosystemLink href="https://swap.fene.app" rel="noopener noreferrer" target="_blank">
             <>
-              <UniswapAppLogo width="20" height="20" />
-              Download the Uniswap app
+              <EcosystemMark isDarkMode={isDarkMode} width="20" height="20" />
+              Visit Fenswap
             </>
-          </DownloadWalletLink>
+          </EcosystemLink>
         </ContentContainer>
         <AboutContentContainer isDarkMode={isDarkMode}>
           <CardGrid cols={cards.length} ref={cardsRef}>

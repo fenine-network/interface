@@ -1,43 +1,47 @@
-# Cloudflare Cloud Functions
+# Cloudflare Workers
 
 ## Purpose
 
-These functions utilize Cloudflare Functions to dynamically inject meta tags server side for richer link sharing capabilities.
+These handlers run on Cloudflare Workers and use Static Assets to serve the SPA while still injecting server-side meta tags and generating dynamic Open Graph images.
 
 ## Functions
 
-Currently, there are 2 types of cloudflare functions developed
+There are 2 runtime concerns in this folder:
 
-- Meta Data Injectors - Workers that inject [Open Graph](https://ogp.me/) standardized meta tags into the `header` of specific webpages.
-  - Currently we support this functionaltiy for three separate webpages: NFT Assets, NFT Collections, and Token Detail Pages
-  - These functions query data from GraphQL and then formats them into HTML `meta` tags to be injected
-- Dynamically Generated Images - Utilizes Vercel's [Open Graph Image Generation Library](https://vercel.com/docs/concepts/functions/edge-functions/og-image-generation) to create custom thumbnails for specific webpages
-  - Currently supports NFT Assets, NFT Collections, and Token Detail Pages
-  - These functions query data from GraphQL, and utilize `Satori` to convert HTML into a png image response which is then returned when the api is called.
-  - Can be found in the `api/image` folder. 
+- Metadata injectors
+  - Routes for token pages, NFT asset pages, and NFT collection pages fetch GraphQL data and inject [Open Graph](https://ogp.me/) tags into the SPA shell before returning HTML.
+- Dynamic image routes
+  - Routes under `api/image` use Vercel's Open Graph tooling to generate share images for token pages, NFT assets, and NFT collections.
+- Worker entry
+  - `worker.ts` is the long-term Cloudflare entrypoint.
+  - It uses the `ASSETS` binding to serve the built CRA bundle, applies SPA fallback via Wrangler Static Assets, and only intercepts routes that need metadata or OG generation.
+  - The Worker is prebuilt into `.cloudflare/worker.mjs` before local preview or deploy so Wrangler does not need to rebundle the TypeScript graph.
 
 ## Testing
 
-Testing is done utilizing a custom jest environment as well as Cloudflare's local tester: `wrangler`. Wrangler enables testing locally by running a proxy to wrap `localhost`. Tests run against a proxy server, so you'll need to start it before running tests:
-- Manually run `yarn start:cloud` to setup wrangler on `localhost:3000`
+Testing is done with a custom jest environment plus local Wrangler preview for Workers Static Assets:
+- Run `yarn start:cloud` to build the app, prebundle the Worker, and preview it through `wrangler dev` on `localhost:3000`
 - Run unit tests with `yarn test:cloud`
 
 ## Deployment
 
-Functions will be deployed to Cloudlfare where they will be ran automatically when the appropriate route is hit. 
+Deploy through Wrangler after building the SPA bundle:
+- `yarn deploy:cloud`
+
+This expects `wrangler.toml` to be the source of truth for the Worker script and Static Assets configuration.
 
 ## Miscellaneous
 - Caching: In order to speed up webpage requests, repeated GraphQL queries will be saved and pulled using Cloudflare's Cache API.
 
 ## Scripts
 
-- `yarn start:cloud` (NODE_OPTIONS=--dns-result-order=ipv4first PORT=3001 npx wrangler pages dev --node-compat --proxy=3001 --port=3000 -- yarn start), script to start local wrangler environment
-  - `npx wrangler pages dev`: this basis of this command which starts a local instance of wrangler to test cloud functions
-  - `--node-compat`: wrangler option that enables compatibility with Node.js modules
-  - `--proxy:3001`: telling the proxy to listen on port 3001
-  - `--port=3000`: telling wrangler to run our proxy on port 3000
-  - `NODE_OPTIONS=--dns-result-order=ipv4first`: wrangler still serves to IPv4 which isn't compatible with Node 18 which default resolves to IPv6 so we need to specify to serve to IPv4
-  - `PORT-3001 --yarn start`: runs default yarn start on port 3001
+- `yarn start:cloud` builds the production bundle and runs `wrangler dev` with Static Assets on port `3000`
+  - `build/` is served through the `ASSETS` binding
+  - `.cloudflare/worker.mjs` is generated from `functions/worker.ts`
+  - `not_found_handling = "single-page-application"` keeps client-side routing working
+  - `run_worker_first` lets the Worker intercept metadata and image routes before static asset resolution
+- `yarn build:cloud:worker` bundles the Cloudflare Worker into a deployable ESM file
+- `yarn deploy:cloud` builds the bundle and deploys the Worker plus static assets
 - `yarn test:cloud` (NODE_OPTIONS=--experimental-vm-modules yarn jest functions  --watch --config=functions/jest.config.json), script to test cloud functions with jest
   - `NODE_OPTIONS=--experimental-vm-modules`: support for ES Modules and Web Assembly
   - `--config=functions/jest.config.json`: specifying which config file to use

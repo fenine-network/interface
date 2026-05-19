@@ -13,9 +13,9 @@ import swapCardImgSrc from './images/swapCard.png'
 export const MAIN_CARDS = [
   {
     to: '/swap',
-    title: 'Swap tokens',
-    description: 'Buy, sell, and explore tokens on Ethereum, Polygon, Optimism, and more.',
-    cta: 'Trade Tokens',
+    title: 'Swap on Fenswap',
+    description: 'Trade tokens across Fenine with a cleaner, faster Fenswap experience.',
+    cta: 'Open swap',
     darkBackgroundImgSrc: swapCardImgSrc,
     lightBackgroundImgSrc: swapCardImgSrc,
     elementName: InterfaceElementName.ABOUT_PAGE_SWAP_CARD,
@@ -23,7 +23,7 @@ export const MAIN_CARDS = [
   {
     to: '/nfts',
     title: 'Trade NFTs',
-    description: 'Buy and sell NFTs across marketplaces to find more listings at better prices.',
+    description: 'Discover NFT collections and manage activity alongside the rest of your Fenine assets.',
     cta: 'Explore NFTs',
     darkBackgroundImgSrc: nftCardImgSrc,
     lightBackgroundImgSrc: nftCardImgSrc,
@@ -40,29 +40,29 @@ const StyledCardLogo = styled.img`
 
 export const MORE_CARDS = [
   {
-    to: 'https://support.uniswap.org/hc/en-us/articles/11306574799117-How-to-use-Moon-Pay-on-the-Uniswap-web-app-',
+    to: 'https://swap.fene.app/explorer',
     external: true,
     title: 'Buy crypto',
-    description: 'Buy crypto with your credit card or bank account at the best rates.',
+    description: 'Start from Fenswap, then jump into explorer views for contracts, balances, and transfers.',
     lightIcon: <DollarSign color={lightTheme.neutral3} size={48} />,
     darkIcon: <StyledCardLogo src={darkDollarImgSrc} alt="Earn" />,
-    cta: 'Buy now',
+    cta: 'Open explorer',
     elementName: InterfaceElementName.ABOUT_PAGE_BUY_CRYPTO_CARD,
   },
   {
     to: '/pools',
     title: 'Earn',
-    description: 'Provide liquidity to pools on Uniswap and earn fees on swaps.',
+    description: 'Provide liquidity on Fenswap pools and capture fees from active Fenine markets.',
     lightIcon: <StyledCardLogo src={lightArrowImgSrc} alt="Analytics" />,
     darkIcon: <StyledCardLogo src={darkArrowImgSrc} alt="Analytics" />,
     cta: 'Provide liquidity',
     elementName: InterfaceElementName.ABOUT_PAGE_EARN_CARD,
   },
   {
-    to: 'https://docs.uniswap.org',
+    to: 'https://swap.fene.app/docs',
     external: true,
     title: 'Build dApps',
-    description: 'Build apps and tools on the largest DeFi protocol on Ethereum.',
+    description: 'Build apps, bots, and integrations around the Fenswap and Fenine EVM stack.',
     lightIcon: <Terminal color={lightTheme.neutral3} size={48} />,
     darkIcon: <StyledCardLogo src={darkTerminalImgSrc} alt="Developers" />,
     cta: 'Developer docs',

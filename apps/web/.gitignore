@@ -58,3 +58,4 @@ cypress/screenshots
 .vercel
 
 .wrangler
+.cloudflare

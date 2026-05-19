@@ -5,7 +5,10 @@ import { useIsDarkMode } from 'theme/components/ThemeToggle'
 
 import meshSrc from './images/Mesh.png'
 
-const DARK_MODE_GRADIENT = 'radial-gradient(101.8% 4091.31% at 0% 0%, #4673FA 0%, #9646FA 100%)'
+const DARK_MODE_GRADIENT =
+  'linear-gradient(125deg, rgba(250, 247, 227, 0.12) 0%, rgba(250, 247, 227, 0.03) 100%), #3b3c3a'
+const LIGHT_MODE_GRADIENT =
+  'linear-gradient(110deg, rgba(19, 62, 82, 0.92) 0%, rgba(45, 73, 86, 0.88) 100%), #133e52'
 
 const Banner = styled.div<{ isDarkMode: boolean }>`
   height: 340px;
@@ -23,9 +26,7 @@ const Banner = styled.div<{ isDarkMode: boolean }>`
   box-shadow: 0px 10px 24px rgba(51, 53, 72, 0.04);
 
   background: ${({ isDarkMode }) =>
-    isDarkMode
-      ? `url(${meshSrc}), ${DARK_MODE_GRADIENT}`
-      : `url(${meshSrc}), linear-gradient(93.06deg, #FF00C7 2.66%, #FF9FFB 98.99%);`};
+    isDarkMode ? `url(${meshSrc}), ${DARK_MODE_GRADIENT}` : `url(${meshSrc}), ${LIGHT_MODE_GRADIENT}`};
 
   @media screen and (min-width: ${BREAKPOINTS.lg}px) {
     height: 140px;
@@ -34,7 +35,7 @@ const Banner = styled.div<{ isDarkMode: boolean }>`
 `
 
 const TextContainer = styled.div`
-  color: white;
+  color: ${({ theme }) => theme.white};
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -80,8 +81,8 @@ const BannerButtonContainer = styled.div`
 `
 
 const BannerButton = styled(ButtonEmpty)`
-  color: white;
-  border: 1px solid white;
+  color: ${({ theme }) => theme.white};
+  border: 1px solid rgba(250, 247, 227, 0.9);
 `
 
 const ProtocolBanner = () => {
@@ -89,14 +90,12 @@ const ProtocolBanner = () => {
   return (
     <Banner isDarkMode={isDarkMode}>
       <TextContainer>
-        <HeaderText>Powered by the Uniswap Protocol</HeaderText>
-        <DescriptionText>
-          The leading decentralized crypto trading protocol, governed by a global community.
-        </DescriptionText>
+        <HeaderText>Built for Fenswap</HeaderText>
+        <DescriptionText>Swap, provide liquidity, and build applications around the Fenine trading experience.</DescriptionText>
       </TextContainer>
       <BannerButtonContainer>
-        <BannerButton width="200px" as="a" href="https://uniswap.org" rel="noopener noreferrer" target="_blank">
-          Learn more
+        <BannerButton width="200px" as="a" href="https://swap.fene.app/docs" rel="noopener noreferrer" target="_blank">
+          Open docs
         </BannerButton>
       </BannerButtonContainer>
     </Banner>

@@ -1,6 +1,6 @@
 import { ReactElement } from 'react'
 
-import { ReactComponent as WinterUni } from '../../assets/svg/winter-uni.svg'
+import { ReactComponent as WinterUni } from '../../assets/svg/logo.svg'
 import { SVGProps } from './UniIcon'
 
 const MONTH_TO_HOLIDAY_UNI: { [date: string]: (props: SVGProps) => ReactElement } = {

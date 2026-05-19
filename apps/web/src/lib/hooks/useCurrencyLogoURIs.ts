@@ -7,6 +7,7 @@ import EthereumLogo from '../../assets/images/ethereum-logo.png'
 import AvaxLogo from '../../assets/svg/avax_logo.svg'
 import BnbLogo from '../../assets/svg/bnb-logo.svg'
 import CeloLogo from '../../assets/svg/celo_logo.svg'
+import FenineLogo from '../../assets/svg/logo.svg'
 import MaticLogo from '../../assets/svg/matic-token-icon.svg'
 import { isCelo, NATIVE_CHAIN_ID, nativeOnChain } from '../../constants/tokens'
 
@@ -37,6 +38,8 @@ export function chainIdToNetworkName(networkId: ChainId): Network {
 
 export function getNativeLogoURI(chainId: ChainId = ChainId.MAINNET): string {
   switch (chainId) {
+    case ChainId.FENINE:
+      return FenineLogo
     case ChainId.POLYGON:
     case ChainId.POLYGON_MUMBAI:
       return MaticLogo

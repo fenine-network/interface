@@ -1,5 +1,5 @@
-import { t } from '@lingui/macro'
 import { ChainId } from '@fenine/sdk-core'
+import { t } from '@lingui/macro'
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import { initializeConnector } from '@web3-react/core'
 import { GnosisSafe } from '@web3-react/gnosis-safe'
@@ -7,9 +7,8 @@ import { MetaMask } from '@web3-react/metamask'
 import { Network } from '@web3-react/network'
 import { Actions, Connector } from '@web3-react/types'
 import GNOSIS_ICON from 'assets/images/gnosis.png'
-import UNISWAP_LOGO from 'assets/svg/logo.svg'
+import FENSWAP_LOGO from 'assets/svg/logo.svg'
 import COINBASE_ICON from 'assets/wallets/coinbase-icon.svg'
-import UNIWALLET_ICON from 'assets/wallets/uniswap-wallet-icon.png'
 import WALLET_CONNECT_ICON from 'assets/wallets/walletconnect-icon.svg'
 import { useSyncExternalStore } from 'react'
 import { isMobile, isNonSupportedDevice } from 'wallet/src/utils/platform'
@@ -186,7 +185,7 @@ const [web3WCV2UniwalletConnect, web3WCV2UniwalletConnectHooks] = initializeConn
   (actions) => new UniwalletWCV2Connect({ actions, onError })
 )
 export const uniwalletWCV2ConnectConnection: Connection = {
-  getProviderInfo: () => ({ name: 'Uniswap Wallet', icon: UNIWALLET_ICON }),
+  getProviderInfo: () => ({ name: 'Fenswap', icon: FENSWAP_LOGO }),
   connector: web3WCV2UniwalletConnect,
   hooks: web3WCV2UniwalletConnectHooks,
   type: ConnectionType.UNISWAP_WALLET_V2,
@@ -199,8 +198,8 @@ const [web3CoinbaseWallet, web3CoinbaseWalletHooks] = initializeConnector<Coinba
       actions,
       options: {
         url: RPC_URLS[ChainId.MAINNET][0],
-        appName: 'Uniswap',
-        appLogoUrl: UNISWAP_LOGO,
+        appName: 'Fenswap',
+        appLogoUrl: FENSWAP_LOGO,
         reloadOnDisconnect: false,
       },
       onError,

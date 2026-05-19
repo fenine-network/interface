@@ -166,7 +166,7 @@ export default function App() {
           you can set it later in the page component itself, since react-helmet prefers the most recently rendered title.
         */}
         <Helmet>
-          <title>{findRouteByPath(location.pathname)?.staticTitle ?? 'Uniswap Interface'}</title>
+          <title>{findRouteByPath(location.pathname)?.staticTitle ?? 'Fenswap'}</title>
         </Helmet>
         <StatsigProvider
           user={statsigUser}
