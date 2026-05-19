@@ -17,6 +17,7 @@ const Collection = lazy(() => import('nft/pages/collection'))
 const Profile = lazy(() => import('nft/pages/profile'))
 const Asset = lazy(() => import('nft/pages/asset/Asset'))
 const Explore = lazy(() => import('pages/Explore'))
+const ExplorerPage = lazy(() => import('pages/Explorer'))
 const AddLiquidityWithTokenRedirects = lazy(() => import('pages/AddLiquidity/redirects'))
 const AddLiquidityV2WithTokenRedirects = lazy(() => import('pages/AddLiquidityV2/redirects'))
 const RedirectExplore = lazy(() => import('pages/Explore/redirects'))
@@ -104,6 +105,12 @@ export const routes: RouteDefinition[] = [
     getElement: (args) => {
       return args.browserRouterEnabled && args.hash ? <Navigate to={args.hash.replace('#', '')} replace /> : <Landing />
     },
+  }),
+  createRouteDefinition({
+    path: '/explorer',
+    staticTitle: t`Explorer on Fenswap`,
+    nestedPaths: [':tab', 'address/:walletAddress', 'pairs/:poolAddress', 'tokens/:tokenAddress'],
+    getElement: () => <ExplorerPage />,
   }),
   createRouteDefinition({
     path: '/explore',

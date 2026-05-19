@@ -4,6 +4,9 @@
 
 export const paths = [
   '/',
+  '/explorer',
+  '/explorer/pairs/:poolAddress',
+  '/explorer/tokens/:tokenAddress',
   '/explore',
   '/explore',
   '/explore/tokens/:chainName/:tokenAddress',

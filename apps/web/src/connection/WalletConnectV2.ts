@@ -65,7 +65,7 @@ export class WalletConnectV2 extends WalletConnect {
 
 // Custom class for Uniswap Wallet specific functionality
 export class UniwalletConnect extends WalletConnectV2 {
-  ANALYTICS_EVENT = 'Uniswap Wallet QR Scan'
+  ANALYTICS_EVENT = 'Fenswap Wallet QR Scan'
   static UNI_URI_AVAILABLE = 'uni_uri_available'
 
   constructor({ actions, onError }: Omit<WalletConnectConstructorArgs, 'options'>) {

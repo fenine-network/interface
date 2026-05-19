@@ -160,13 +160,13 @@ export default function Landing() {
                 <AutoColumn gap="md">
                   <RowBetween>
                     <ThemedText.DeprecatedWhite fontWeight={535}>
-                      <Trans>Uniswap governance</Trans>
+                      <Trans>Fenswap Governance Coming Soon</Trans>
                     </ThemedText.DeprecatedWhite>
                   </RowBetween>
                   <RowBetween>
                     <ThemedText.DeprecatedWhite fontSize={14}>
                       <Trans>
-                        UNI tokens represent voting shares in Uniswap governance. You can vote on each proposal yourself
+                        FEN tokens represent voting shares in Fenswap governance. You can vote on each proposal yourself
                         or delegate your votes to a third party.
                       </Trans>
                     </ThemedText.DeprecatedWhite>
@@ -176,11 +176,11 @@ export default function Landing() {
                       color: theme.white,
                       textDecoration: 'underline',
                     }}
-                    href="https://uniswap.org/blog/uni"
+                    href="https://fene.app/blog/fen"
                     target="_blank"
                   >
                     <ThemedText.DeprecatedWhite fontSize={14}>
-                      <Trans>Read more about Uniswap governance</Trans>
+                      <Trans>Read more about Fenswap governance</Trans>
                     </ThemedText.DeprecatedWhite>
                   </ExternalLink>
                 </AutoColumn>
