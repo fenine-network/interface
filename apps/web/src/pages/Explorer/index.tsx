@@ -3,7 +3,7 @@ import { ChainId } from '@fenine/sdk-core'
 import { t, Trans } from '@lingui/macro'
 import { useWeb3React } from '@web3-react/core'
 import AssetLogo from 'components/Logo/AssetLogo'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { ArrowUpRight, Search } from 'react-feather'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
@@ -14,6 +14,9 @@ import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
 
 const FENINE_CHAIN_ID = ChainId.FENINE
 const DEFAULT_PAGE_SIZE = 25
+const DETAIL_POOL_PAGE_SIZE = 20
+const DETAIL_TOKEN_POOL_PAGE_SIZE = 12
+const DETAIL_TOKEN_SWAP_PAGE_SIZE = 20
 
 enum ExplorerTab {
   Activity = 'activity',
@@ -100,13 +103,13 @@ type TokenDetailQueryResult = {
 }
 
 const EXPLORER_ACTIVITY_QUERY = gql`
-  query ExplorerActivity($first: Int!) {
+  query ExplorerActivity($first: Int!, $skip: Int!) {
     _meta {
       block {
         number
       }
     }
-    swaps(first: $first, orderBy: timestamp, orderDirection: desc) {
+    swaps(first: $first, skip: $skip, orderBy: timestamp, orderDirection: desc) {
       id
       timestamp
       origin
@@ -155,8 +158,8 @@ const EXPLORER_ACTIVITY_QUERY = gql`
 `
 
 const EXPLORER_POOLS_QUERY = gql`
-  query ExplorerPools($first: Int!) {
-    pools(first: $first, orderBy: totalValueLockedUSD, orderDirection: desc) {
+  query ExplorerPools($first: Int!, $skip: Int!) {
+    pools(first: $first, skip: $skip, orderBy: totalValueLockedUSD, orderDirection: desc) {
       id
       feeTier
       createdAtTimestamp
@@ -183,8 +186,8 @@ const EXPLORER_POOLS_QUERY = gql`
 `
 
 const EXPLORER_TOKENS_QUERY = gql`
-  query ExplorerTokens($first: Int!) {
-    tokens(first: $first, orderBy: volumeUSD, orderDirection: desc) {
+  query ExplorerTokens($first: Int!, $skip: Int!) {
+    tokens(first: $first, skip: $skip, orderBy: volumeUSD, orderDirection: desc) {
       id
       symbol
       name
@@ -199,8 +202,8 @@ const EXPLORER_TOKENS_QUERY = gql`
 `
 
 const EXPLORER_WALLET_QUERY = gql`
-  query ExplorerWallet($first: Int!, $origin: Bytes!) {
-    swaps(first: $first, where: { origin: $origin }, orderBy: timestamp, orderDirection: desc) {
+  query ExplorerWallet($first: Int!, $origin: Bytes!, $skip: Int!) {
+    swaps(first: $first, skip: $skip, where: { origin: $origin }, orderBy: timestamp, orderDirection: desc) {
       id
       timestamp
       origin
@@ -249,7 +252,7 @@ const EXPLORER_WALLET_QUERY = gql`
 `
 
 const EXPLORER_POOL_DETAIL_QUERY = gql`
-  query ExplorerPoolDetail($poolId: ID!, $first: Int!) {
+  query ExplorerPoolDetail($poolId: ID!, $first: Int!, $skip: Int!) {
     pool(id: $poolId) {
       id
       feeTier
@@ -273,7 +276,7 @@ const EXPLORER_POOL_DETAIL_QUERY = gql`
         name
       }
     }
-    swaps(first: $first, where: { pool: $poolId }, orderBy: timestamp, orderDirection: desc) {
+    swaps(first: $first, skip: $skip, where: { pool: $poolId }, orderBy: timestamp, orderDirection: desc) {
       id
       timestamp
       origin
@@ -320,7 +323,7 @@ const EXPLORER_POOL_DETAIL_QUERY = gql`
 `
 
 const EXPLORER_TOKEN_DETAIL_QUERY = gql`
-  query ExplorerTokenDetail($tokenId: ID!, $firstPools: Int!, $firstSwaps: Int!) {
+  query ExplorerTokenDetail($tokenId: ID!, $firstPools: Int!, $skipPools: Int!, $firstSwaps: Int!, $skipSwaps: Int!) {
     token(id: $tokenId) {
       id
       symbol
@@ -334,6 +337,7 @@ const EXPLORER_TOKEN_DETAIL_QUERY = gql`
     }
     token0Pools: pools(
       first: $firstPools
+      skip: $skipPools
       where: { token0: $tokenId }
       orderBy: totalValueLockedUSD
       orderDirection: desc
@@ -362,6 +366,7 @@ const EXPLORER_TOKEN_DETAIL_QUERY = gql`
     }
     token1Pools: pools(
       first: $firstPools
+      skip: $skipPools
       where: { token1: $tokenId }
       orderBy: totalValueLockedUSD
       orderDirection: desc
@@ -388,7 +393,13 @@ const EXPLORER_TOKEN_DETAIL_QUERY = gql`
         name
       }
     }
-    token0Swaps: swaps(first: $firstSwaps, where: { token0: $tokenId }, orderBy: timestamp, orderDirection: desc) {
+    token0Swaps: swaps(
+      first: $firstSwaps
+      skip: $skipSwaps
+      where: { token0: $tokenId }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
       id
       timestamp
       origin
@@ -431,7 +442,13 @@ const EXPLORER_TOKEN_DETAIL_QUERY = gql`
         blockNumber
       }
     }
-    token1Swaps: swaps(first: $firstSwaps, where: { token1: $tokenId }, orderBy: timestamp, orderDirection: desc) {
+    token1Swaps: swaps(
+      first: $firstSwaps
+      skip: $skipSwaps
+      where: { token1: $tokenId }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
       id
       timestamp
       origin
@@ -647,9 +664,46 @@ const PrimaryButton = styled.button`
   cursor: pointer;
 `
 
+const SecondaryButton = styled.button<{ disabled?: boolean }>`
+  height: 42px;
+  border-radius: 16px;
+  padding: 0 14px;
+  border: 1px solid ${({ theme }) => theme.surface3};
+  background: ${({ theme }) => theme.surface1};
+  color: ${({ theme, disabled }) => (disabled ? theme.neutral3 : theme.neutral1)};
+  font-size: 14px;
+  font-weight: 600;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${({ disabled }) => (disabled ? 0.65 : 1)};
+`
+
 const EmptyState = styled.div`
   padding: 28px 20px;
   text-align: center;
+`
+
+const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-top: 1px solid ${({ theme }) => theme.surface3};
+
+  @media screen and (max-width: ${({ theme }) => `${theme.breakpoint.md}px`}) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`
+
+const PaginationActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @media screen and (max-width: ${({ theme }) => `${theme.breakpoint.md}px`}) {
+    justify-content: stretch;
+  }
 `
 
 const InlineLink = styled(Link)`
@@ -714,9 +768,10 @@ function formatFeeTier(feeTier: string) {
 }
 
 function formatTimestamp(timestamp: string) {
-  return new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+  return new Intl.DateTimeFormat('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
   }).format(new Date(Number(timestamp) * 1000))
 }
 
@@ -750,11 +805,57 @@ function ExplorerTableMessage({ message }: { message: ReactNode }) {
   )
 }
 
-function ActivityTable({ swaps }: { swaps: ExplorerSwap[] }) {
+function TablePagination({
+  currentPage,
+  hasNextPage,
+  itemCount,
+  pageSize,
+  onPrevious,
+  onNext,
+}: {
+  currentPage: number
+  hasNextPage: boolean
+  itemCount: number
+  pageSize: number
+  onPrevious: () => void
+  onNext: () => void
+}) {
+  return (
+    <PaginationRow>
+      <ThemedText.BodySecondary>
+        Showing {itemCount ? (currentPage - 1) * pageSize + 1 : 0}-
+        {itemCount ? (currentPage - 1) * pageSize + itemCount : 0} results
+      </ThemedText.BodySecondary>
+      <PaginationActions>
+        <SecondaryButton disabled={currentPage === 1} onClick={onPrevious} type="button">
+          Previous
+        </SecondaryButton>
+        <ThemedText.BodySecondary>Page {currentPage}</ThemedText.BodySecondary>
+        <SecondaryButton disabled={!hasNextPage} onClick={onNext} type="button">
+          Next
+        </SecondaryButton>
+      </PaginationActions>
+    </PaginationRow>
+  )
+}
+
+function ActivityTable({
+  swaps,
+  currentPage,
+  pageSize,
+  onPreviousPage,
+  onNextPage,
+}: {
+  swaps: ExplorerSwap[]
+  currentPage: number
+  pageSize: number
+  onPreviousPage: () => void
+  onNextPage: () => void
+}) {
   const { formatNumber } = useFormatter()
 
   if (!swaps.length) {
-    return <ExplorerTableMessage message={t`Belum ada activity swap yang terindeks.`} />
+    return <ExplorerTableMessage message={t`No indexed swap activity found yet.`} />
   }
 
   return (
@@ -763,9 +864,9 @@ function ActivityTable({ swaps }: { swaps: ExplorerSwap[] }) {
         <StyledTable>
           <thead>
             <tr>
-              <HeadCell>Waktu</HeadCell>
+              <HeadCell>Date</HeadCell>
               <HeadCell>Pair</HeadCell>
-              <HeadCell>Aksi</HeadCell>
+              <HeadCell>Action</HeadCell>
               <HeadCell>Amount</HeadCell>
               <HeadCell>Value</HeadCell>
               <HeadCell>Wallet</HeadCell>
@@ -826,15 +927,35 @@ function ActivityTable({ swaps }: { swaps: ExplorerSwap[] }) {
           </tbody>
         </StyledTable>
       </TableScroll>
+      <TablePagination
+        currentPage={currentPage}
+        hasNextPage={swaps.length >= pageSize}
+        itemCount={swaps.length}
+        pageSize={pageSize}
+        onPrevious={onPreviousPage}
+        onNext={onNextPage}
+      />
     </ContentCard>
   )
 }
 
-function PairsTable({ pools }: { pools: ExplorerPool[] }) {
+function PairsTable({
+  pools,
+  currentPage,
+  pageSize,
+  onPreviousPage,
+  onNextPage,
+}: {
+  pools: ExplorerPool[]
+  currentPage: number
+  pageSize: number
+  onPreviousPage: () => void
+  onNextPage: () => void
+}) {
   const { formatNumber } = useFormatter()
 
   if (!pools.length) {
-    return <ExplorerTableMessage message={t`Belum ada pool aktif yang terindeks.`} />
+    return <ExplorerTableMessage message={t`No active pools have been indexed yet.`} />
   }
 
   return (
@@ -902,15 +1023,35 @@ function PairsTable({ pools }: { pools: ExplorerPool[] }) {
           </tbody>
         </StyledTable>
       </TableScroll>
+      <TablePagination
+        currentPage={currentPage}
+        hasNextPage={pools.length >= pageSize}
+        itemCount={pools.length}
+        pageSize={pageSize}
+        onPrevious={onPreviousPage}
+        onNext={onNextPage}
+      />
     </ContentCard>
   )
 }
 
-function TokensTable({ tokens }: { tokens: ExplorerTopToken[] }) {
+function TokensTable({
+  tokens,
+  currentPage,
+  pageSize,
+  onPreviousPage,
+  onNextPage,
+}: {
+  tokens: ExplorerTopToken[]
+  currentPage: number
+  pageSize: number
+  onPreviousPage: () => void
+  onNextPage: () => void
+}) {
   const { formatNumber } = useFormatter()
 
   if (!tokens.length) {
-    return <ExplorerTableMessage message={t`Belum ada token aktif yang terindeks.`} />
+    return <ExplorerTableMessage message={t`No active tokens have been indexed yet.`} />
   }
 
   return (
@@ -972,6 +1113,14 @@ function TokensTable({ tokens }: { tokens: ExplorerTopToken[] }) {
           </tbody>
         </StyledTable>
       </TableScroll>
+      <TablePagination
+        currentPage={currentPage}
+        hasNextPage={tokens.length >= pageSize}
+        itemCount={tokens.length}
+        pageSize={pageSize}
+        onPrevious={onPreviousPage}
+        onNext={onNextPage}
+      />
     </ContentCard>
   )
 }
@@ -979,20 +1128,26 @@ function TokensTable({ tokens }: { tokens: ExplorerTopToken[] }) {
 function PoolDetailView({ poolAddress }: { poolAddress: string }) {
   const poolId = poolAddress.toLowerCase()
   const { formatNumber } = useFormatter()
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    setPage(1)
+  }, [poolId])
+
   const { data, loading } = useQuery<PoolDetailQueryResult>(EXPLORER_POOL_DETAIL_QUERY, {
-    variables: { poolId, first: DEFAULT_PAGE_SIZE },
+    variables: { poolId, first: DETAIL_POOL_PAGE_SIZE, skip: (page - 1) * DETAIL_POOL_PAGE_SIZE },
     skip: !poolAddress,
     pollInterval: 30_000,
     fetchPolicy: 'no-cache',
   })
 
   if (loading && !data?.pool) {
-    return <ExplorerTableMessage message={t`Memuat detail pool...`} />
+    return <ExplorerTableMessage message={t`Loading pool details...`} />
   }
 
   const pool = data?.pool
   if (!pool) {
-    return <ExplorerTableMessage message={t`Pool tidak ditemukan di subgraph Fenine.`} />
+    return <ExplorerTableMessage message={t`Pool not found in the Fenine subgraph.`} />
   }
 
   return (
@@ -1032,7 +1187,7 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
         <InfoStatCard
           label={t`TVL`}
           value={formatNumber({ input: parseAmount(pool.totalValueLockedUSD), type: NumberType.FiatTokenStats })}
-          hint={t`Liquidity tracked by subgraph`}
+          hint={t`Liquidity tracked by the subgraph`}
         />
         <InfoStatCard
           label={t`Volume`}
@@ -1084,10 +1239,20 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
           <Trans>Recent swaps</Trans>
         </ThemedText.HeadlineSmall>
         <ThemedText.BodySecondary>
-          <Trans>Interaksi terbaru yang terjadi pada pool ini.</Trans>
+          <Trans>Latest swap activity for this pool.</Trans>
         </ThemedText.BodySecondary>
       </Header>
-      <ActivityTable swaps={data?.swaps ?? []} />
+      <ActivityTable
+        swaps={data?.swaps ?? []}
+        currentPage={page}
+        pageSize={DETAIL_POOL_PAGE_SIZE}
+        onPreviousPage={() => setPage((value) => Math.max(1, value - 1))}
+        onNextPage={() => {
+          if ((data?.swaps?.length ?? 0) >= DETAIL_POOL_PAGE_SIZE) {
+            setPage((value) => value + 1)
+          }
+        }}
+      />
     </>
   )
 }
@@ -1095,20 +1260,34 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
 function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
   const tokenId = tokenAddress.toLowerCase()
   const { formatNumber } = useFormatter()
+  const [poolPage, setPoolPage] = useState(1)
+  const [swapPage, setSwapPage] = useState(1)
+
+  useEffect(() => {
+    setPoolPage(1)
+    setSwapPage(1)
+  }, [tokenId])
+
   const { data, loading } = useQuery<TokenDetailQueryResult>(EXPLORER_TOKEN_DETAIL_QUERY, {
-    variables: { tokenId, firstPools: 12, firstSwaps: DEFAULT_PAGE_SIZE },
+    variables: {
+      tokenId,
+      firstPools: DETAIL_TOKEN_POOL_PAGE_SIZE,
+      skipPools: (poolPage - 1) * DETAIL_TOKEN_POOL_PAGE_SIZE,
+      firstSwaps: DETAIL_TOKEN_SWAP_PAGE_SIZE,
+      skipSwaps: (swapPage - 1) * DETAIL_TOKEN_SWAP_PAGE_SIZE,
+    },
     skip: !tokenAddress,
     pollInterval: 30_000,
     fetchPolicy: 'no-cache',
   })
 
   if (loading && !data?.token) {
-    return <ExplorerTableMessage message={t`Memuat detail token...`} />
+    return <ExplorerTableMessage message={t`Loading token details...`} />
   }
 
   const token = data?.token
   if (!token) {
-    return <ExplorerTableMessage message={t`Token tidak ditemukan di subgraph Fenine.`} />
+    return <ExplorerTableMessage message={t`Token not found in the Fenine subgraph.`} />
   }
 
   const relatedPools = dedupePools([...(data?.token0Pools ?? []), ...(data?.token1Pools ?? [])]).sort(
@@ -1175,20 +1354,40 @@ function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
           <Trans>Top related pools</Trans>
         </ThemedText.HeadlineSmall>
         <ThemedText.BodySecondary>
-          <Trans>Pool dengan TVL tertinggi yang melibatkan token ini.</Trans>
+          <Trans>Pools with the deepest liquidity for this token.</Trans>
         </ThemedText.BodySecondary>
       </Header>
-      <PairsTable pools={relatedPools.slice(0, 12)} />
+      <PairsTable
+        pools={relatedPools}
+        currentPage={poolPage}
+        pageSize={DETAIL_TOKEN_POOL_PAGE_SIZE}
+        onPreviousPage={() => setPoolPage((value) => Math.max(1, value - 1))}
+        onNextPage={() => {
+          if (relatedPools.length >= DETAIL_TOKEN_POOL_PAGE_SIZE) {
+            setPoolPage((value) => value + 1)
+          }
+        }}
+      />
 
       <Header style={{ marginTop: 24, marginBottom: 16 }}>
         <ThemedText.HeadlineSmall>
           <Trans>Recent swaps</Trans>
         </ThemedText.HeadlineSmall>
         <ThemedText.BodySecondary>
-          <Trans>Swap terbaru yang melibatkan token ini di seluruh pool Fenswap.</Trans>
+          <Trans>Latest swaps involving this token across Fenswap pools.</Trans>
         </ThemedText.BodySecondary>
       </Header>
-      <ActivityTable swaps={relatedSwaps.slice(0, DEFAULT_PAGE_SIZE)} />
+      <ActivityTable
+        swaps={relatedSwaps}
+        currentPage={swapPage}
+        pageSize={DETAIL_TOKEN_SWAP_PAGE_SIZE}
+        onPreviousPage={() => setSwapPage((value) => Math.max(1, value - 1))}
+        onNextPage={() => {
+          if (relatedSwaps.length >= DETAIL_TOKEN_SWAP_PAGE_SIZE) {
+            setSwapPage((value) => value + 1)
+          }
+        }}
+      />
     </>
   )
 }
@@ -1208,6 +1407,10 @@ export default function ExplorerPage() {
     tokenAddress?: string
   }>()
   const [walletInput, setWalletInput] = useState(walletAddress ?? account ?? '')
+  const [activityPage, setActivityPage] = useState(1)
+  const [pairsPage, setPairsPage] = useState(1)
+  const [tokensPage, setTokensPage] = useState(1)
+  const [walletPage, setWalletPage] = useState(1)
   const { formatNumber } = useFormatter()
 
   const activeTab = useMemo<ExplorerTab>(() => {
@@ -1219,24 +1422,31 @@ export default function ExplorerPage() {
     return ExplorerTab.Activity
   }, [poolAddress, rawTab, tokenAddress, walletAddress])
 
+  useEffect(() => {
+    setActivityPage(1)
+    setPairsPage(1)
+    setTokensPage(1)
+    setWalletPage(1)
+  }, [activeTab, walletAddress, poolAddress, tokenAddress])
+
   const {
     data: activityData,
     loading: activityLoading,
     error: activityError,
   } = useQuery<ActivityQueryResult>(EXPLORER_ACTIVITY_QUERY, {
-    variables: { first: DEFAULT_PAGE_SIZE },
+    variables: { first: DEFAULT_PAGE_SIZE, skip: (activityPage - 1) * DEFAULT_PAGE_SIZE },
     pollInterval: 30_000,
     fetchPolicy: 'no-cache',
   })
 
   const { data: poolsData, loading: poolsLoading } = useQuery<PoolsQueryResult>(EXPLORER_POOLS_QUERY, {
-    variables: { first: DEFAULT_PAGE_SIZE },
+    variables: { first: DEFAULT_PAGE_SIZE, skip: (pairsPage - 1) * DEFAULT_PAGE_SIZE },
     pollInterval: 60_000,
     fetchPolicy: 'no-cache',
   })
 
   const { data: tokensData, loading: tokensLoading } = useQuery<TokensQueryResult>(EXPLORER_TOKENS_QUERY, {
-    variables: { first: DEFAULT_PAGE_SIZE },
+    variables: { first: DEFAULT_PAGE_SIZE, skip: (tokensPage - 1) * DEFAULT_PAGE_SIZE },
     pollInterval: 60_000,
     fetchPolicy: 'no-cache',
   })
@@ -1247,7 +1457,11 @@ export default function ExplorerPage() {
   }, [walletAddress])
   const walletQueryEnabled = Boolean(normalizedWalletAddress)
   const { data: walletData, loading: walletLoading } = useQuery<{ swaps: ExplorerSwap[] }>(EXPLORER_WALLET_QUERY, {
-    variables: { first: DEFAULT_PAGE_SIZE, origin: normalizedWalletAddress },
+    variables: {
+      first: DEFAULT_PAGE_SIZE,
+      origin: normalizedWalletAddress,
+      skip: (walletPage - 1) * DEFAULT_PAGE_SIZE,
+    },
     skip: !walletQueryEnabled,
     pollInterval: 30_000,
     fetchPolicy: 'no-cache',
@@ -1281,41 +1495,81 @@ export default function ExplorerPage() {
     }
 
     if (activityError) {
-      return <ExplorerTableMessage message={t`Subgraph Fenine belum merespons. Coba refresh lagi.`} />
+      return <ExplorerTableMessage message={t`The Fenine subgraph is not responding right now. Please try again.`} />
     }
 
     if (activeTab === ExplorerTab.Pairs) {
       return poolsLoading && !topPools.length ? (
-        <ExplorerTableMessage message={t`Memuat ranking pools...`} />
+        <ExplorerTableMessage message={t`Loading ranked pools...`} />
       ) : (
-        <PairsTable pools={topPools} />
+        <PairsTable
+          pools={topPools}
+          currentPage={pairsPage}
+          pageSize={DEFAULT_PAGE_SIZE}
+          onPreviousPage={() => setPairsPage((value) => Math.max(1, value - 1))}
+          onNextPage={() => {
+            if (topPools.length >= DEFAULT_PAGE_SIZE) {
+              setPairsPage((value) => value + 1)
+            }
+          }}
+        />
       )
     }
 
     if (activeTab === ExplorerTab.Tokens) {
       return tokensLoading && !topTokens.length ? (
-        <ExplorerTableMessage message={t`Memuat ranking tokens...`} />
+        <ExplorerTableMessage message={t`Loading ranked tokens...`} />
       ) : (
-        <TokensTable tokens={topTokens} />
+        <TokensTable
+          tokens={topTokens}
+          currentPage={tokensPage}
+          pageSize={DEFAULT_PAGE_SIZE}
+          onPreviousPage={() => setTokensPage((value) => Math.max(1, value - 1))}
+          onNextPage={() => {
+            if (topTokens.length >= DEFAULT_PAGE_SIZE) {
+              setTokensPage((value) => value + 1)
+            }
+          }}
+        />
       )
     }
 
     if (activeTab === ExplorerTab.Wallet) {
       if (!walletQueryEnabled) {
-        return <ExplorerTableMessage message={t`Masukkan wallet address untuk melihat activity pada Fenswap.`} />
+        return <ExplorerTableMessage message={t`Enter a wallet address to inspect Fenswap activity.`} />
       }
 
       return walletLoading && !walletSwaps.length ? (
-        <ExplorerTableMessage message={t`Memuat activity wallet...`} />
+        <ExplorerTableMessage message={t`Loading wallet activity...`} />
       ) : (
-        <ActivityTable swaps={walletSwaps} />
+        <ActivityTable
+          swaps={walletSwaps}
+          currentPage={walletPage}
+          pageSize={DEFAULT_PAGE_SIZE}
+          onPreviousPage={() => setWalletPage((value) => Math.max(1, value - 1))}
+          onNextPage={() => {
+            if (walletSwaps.length >= DEFAULT_PAGE_SIZE) {
+              setWalletPage((value) => value + 1)
+            }
+          }}
+        />
       )
     }
 
     return activityLoading && !recentSwaps.length ? (
-      <ExplorerTableMessage message={t`Memuat activity terbaru...`} />
+      <ExplorerTableMessage message={t`Loading recent activity...`} />
     ) : (
-      <ActivityTable swaps={recentSwaps} />
+      <ActivityTable
+        swaps={recentSwaps}
+        currentPage={activityPage}
+        pageSize={DEFAULT_PAGE_SIZE}
+        onPreviousPage={() => setActivityPage((value) => Math.max(1, value - 1))}
+        onNextPage={() => {
+          if (recentSwaps.length >= DEFAULT_PAGE_SIZE) {
+            setActivityPage((value) => value + 1)
+          }
+        }}
+      />
     )
   }
 
@@ -1328,7 +1582,7 @@ export default function ExplorerPage() {
               <Trans>Explorer</Trans>
             </ThemedText.Hero>
             <ThemedText.BodySecondary style={{ marginTop: 8 }}>
-              <Trans>Trace swaps, pools, tokens, dan wallet activity langsung dari subgraph Fenine.</Trans>
+              <Trans>Trace swaps, pools, tokens, and wallet activity directly from the Fenine subgraph.</Trans>
             </ThemedText.BodySecondary>
           </div>
           <Badge>
@@ -1399,10 +1653,10 @@ export default function ExplorerPage() {
         <WalletInput
           value={walletInput}
           onChange={(event) => setWalletInput(event.target.value)}
-          placeholder="0x... wallet address untuk trace activity"
+          placeholder="0x... wallet address"
         />
         <PrimaryButton type="submit">
-          <Trans>Trace wallet</Trans>
+          <Trans>View wallet</Trans>
         </PrimaryButton>
       </WalletBar>
 
