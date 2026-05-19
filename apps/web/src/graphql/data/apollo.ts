@@ -8,8 +8,10 @@ if (!CONFIGURED_GRAPHQL_URL) {
   throw new Error('AWS URL MISSING FROM ENVIRONMENT')
 }
 
-const GRAPHQL_URL = typeof window !== 'undefined' && window.location.protocol === 'https:' && CONFIGURED_GRAPHQL_URL.startsWith('http://')
-  ? `${window.location.origin}/api/subgraph`
+const HOSTED_FENINE_SUBGRAPH_URL = 'https://subgraph.fene.app/subgraphs/name/uniswap-v3-fenine'
+
+const GRAPHQL_URL = CONFIGURED_GRAPHQL_URL.startsWith('http://')
+  ? HOSTED_FENINE_SUBGRAPH_URL
   : CONFIGURED_GRAPHQL_URL
 
 // Silently handle GraphQL errors (schema mismatch with Fenine subgraph)
