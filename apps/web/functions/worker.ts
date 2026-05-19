@@ -11,9 +11,8 @@ import {
 
 interface Env {
   ASSETS: Fetcher
+  SUBGRAPH_URL: string
 }
-
-const FENINE_SUBGRAPH_URL = 'http://34.101.145.221:8000/subgraphs/name/uniswap-v3-fenine'
 
 function matchPath(pathname: string, pattern: RegExp): string[] | undefined {
   const match = pathname.match(pattern)
@@ -26,7 +25,7 @@ export default {
     const { pathname } = url
 
     if (pathname === '/api/subgraph') {
-      const upstream = await fetch(FENINE_SUBGRAPH_URL, {
+      const upstream = await fetch(env.SUBGRAPH_URL, {
         method: request.method,
         headers: {
           'Content-Type': 'application/json',

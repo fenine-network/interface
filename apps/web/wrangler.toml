@@ -4,6 +4,13 @@ compatibility_date = "2026-05-19"
 compatibility_flags = ["nodejs_compat"]
 no_bundle = true
 
+[vars]
+SUBGRAPH_URL = "https://subgraph.fene.app/subgraphs/name/uniswap-v3-fenine"
+
+[[routes]]
+pattern = "swap-testnet.fene.app"
+custom_domain = true
+
 [assets]
 directory = "./build"
 binding = "ASSETS"
