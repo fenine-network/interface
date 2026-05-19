@@ -13,6 +13,8 @@ interface Env {
   ASSETS: Fetcher
 }
 
+const FENINE_SUBGRAPH_URL = 'http://34.101.145.221:8000/subgraphs/name/uniswap-v3-fenine'
+
 function matchPath(pathname: string, pattern: RegExp): string[] | undefined {
   const match = pathname.match(pattern)
   return match?.slice(1)
@@ -22,6 +24,25 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
     const { pathname } = url
+
+    if (pathname === '/api/subgraph') {
+      const upstream = await fetch(FENINE_SUBGRAPH_URL, {
+        method: request.method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: ['GET', 'HEAD'].includes(request.method) ? undefined : await request.text(),
+      })
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        statusText: upstream.statusText,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      })
+    }
 
     const tokenImageSegments = matchPath(pathname, /^\/api\/image\/tokens\/([^/]+)\/([^/]+)$/)
     if (tokenImageSegments) {

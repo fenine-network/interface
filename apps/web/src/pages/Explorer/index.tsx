@@ -1,6 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
 import { ChainId } from '@fenine/sdk-core'
-import { t, Trans } from '@lingui/macro'
 import { useWeb3React } from '@web3-react/core'
 import AssetLogo from 'components/Logo/AssetLogo'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
@@ -855,7 +854,7 @@ function ActivityTable({
   const { formatNumber } = useFormatter()
 
   if (!swaps.length) {
-    return <ExplorerTableMessage message={t`No indexed swap activity found yet.`} />
+    return <ExplorerTableMessage message="No indexed swap activity found yet." />
   }
 
   return (
@@ -955,7 +954,7 @@ function PairsTable({
   const { formatNumber } = useFormatter()
 
   if (!pools.length) {
-    return <ExplorerTableMessage message={t`No active pools have been indexed yet.`} />
+    return <ExplorerTableMessage message="No active pools have been indexed yet." />
   }
 
   return (
@@ -1051,7 +1050,7 @@ function TokensTable({
   const { formatNumber } = useFormatter()
 
   if (!tokens.length) {
-    return <ExplorerTableMessage message={t`No active tokens have been indexed yet.`} />
+    return <ExplorerTableMessage message="No active tokens have been indexed yet." />
   }
 
   return (
@@ -1142,12 +1141,12 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
   })
 
   if (loading && !data?.pool) {
-    return <ExplorerTableMessage message={t`Loading pool details...`} />
+    return <ExplorerTableMessage message="Loading pool details..." />
   }
 
   const pool = data?.pool
   if (!pool) {
-    return <ExplorerTableMessage message={t`Pool not found in the Fenine subgraph.`} />
+    return <ExplorerTableMessage message="Pool not found in the Fenine subgraph." />
   }
 
   return (
@@ -1180,22 +1179,22 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
 
       <StatsGrid>
         <InfoStatCard
-          label={t`Current price`}
+          label="Current price"
           value={<>{formatNumber({ input: parseAmount(pool.token1Price), type: NumberType.SwapPrice })}</>}
           hint={`${pool.token1.symbol} per ${pool.token0.symbol}`}
         />
         <InfoStatCard
-          label={t`TVL`}
+          label="TVL"
           value={formatNumber({ input: parseAmount(pool.totalValueLockedUSD), type: NumberType.FiatTokenStats })}
-          hint={t`Liquidity tracked by the subgraph`}
+          hint="Liquidity tracked by the subgraph"
         />
         <InfoStatCard
-          label={t`Volume`}
+          label="Volume"
           value={formatNumber({ input: parseAmount(pool.volumeUSD), type: NumberType.FiatTokenStats })}
-          hint={t`All-time volume`}
+          hint="All-time volume"
         />
         <InfoStatCard
-          label={t`Transactions`}
+          label="Transactions"
           value={formatNumber({ input: parseAmount(pool.txCount), type: NumberType.WholeNumber })}
           hint={`Tick ${pool.tick ?? '-'}`}
         />
@@ -1235,12 +1234,8 @@ function PoolDetailView({ poolAddress }: { poolAddress: string }) {
       </ContentCard>
 
       <Header style={{ marginBottom: 16 }}>
-        <ThemedText.HeadlineSmall>
-          <Trans>Recent swaps</Trans>
-        </ThemedText.HeadlineSmall>
-        <ThemedText.BodySecondary>
-          <Trans>Latest swap activity for this pool.</Trans>
-        </ThemedText.BodySecondary>
+        <ThemedText.HeadlineSmall>Recent swaps</ThemedText.HeadlineSmall>
+        <ThemedText.BodySecondary>Latest swap activity for this pool.</ThemedText.BodySecondary>
       </Header>
       <ActivityTable
         swaps={data?.swaps ?? []}
@@ -1282,12 +1277,12 @@ function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
   })
 
   if (loading && !data?.token) {
-    return <ExplorerTableMessage message={t`Loading token details...`} />
+    return <ExplorerTableMessage message="Loading token details..." />
   }
 
   const token = data?.token
   if (!token) {
-    return <ExplorerTableMessage message={t`Token not found in the Fenine subgraph.`} />
+    return <ExplorerTableMessage message="Token not found in the Fenine subgraph." />
   }
 
   const relatedPools = dedupePools([...(data?.token0Pools ?? []), ...(data?.token1Pools ?? [])]).sort(
@@ -1324,22 +1319,22 @@ function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
 
       <StatsGrid>
         <InfoStatCard
-          label={t`Volume`}
+          label="Volume"
           value={formatNumber({ input: parseAmount(token.volumeUSD), type: NumberType.FiatTokenStats })}
-          hint={t`All-time traded volume`}
+          hint="All-time traded volume"
         />
         <InfoStatCard
-          label={t`TVL`}
+          label="TVL"
           value={formatNumber({ input: parseAmount(token.totalValueLockedUSD), type: NumberType.FiatTokenStats })}
-          hint={t`Liquidity across pools`}
+          hint="Liquidity across pools"
         />
         <InfoStatCard
-          label={t`Pools`}
+          label="Pools"
           value={formatNumber({ input: parseAmount(token.poolCount), type: NumberType.WholeNumber })}
           hint={shortenAddress(token.id)}
         />
         <InfoStatCard
-          label={t`Transactions`}
+          label="Transactions"
           value={formatNumber({ input: parseAmount(token.txCount), type: NumberType.WholeNumber })}
           hint={
             token.totalSupply
@@ -1350,12 +1345,8 @@ function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
       </StatsGrid>
 
       <Header style={{ marginBottom: 16 }}>
-        <ThemedText.HeadlineSmall>
-          <Trans>Top related pools</Trans>
-        </ThemedText.HeadlineSmall>
-        <ThemedText.BodySecondary>
-          <Trans>Pools with the deepest liquidity for this token.</Trans>
-        </ThemedText.BodySecondary>
+        <ThemedText.HeadlineSmall>Top related pools</ThemedText.HeadlineSmall>
+        <ThemedText.BodySecondary>Pools with the deepest liquidity for this token.</ThemedText.BodySecondary>
       </Header>
       <PairsTable
         pools={relatedPools}
@@ -1370,12 +1361,8 @@ function TokenDetailView({ tokenAddress }: { tokenAddress: string }) {
       />
 
       <Header style={{ marginTop: 24, marginBottom: 16 }}>
-        <ThemedText.HeadlineSmall>
-          <Trans>Recent swaps</Trans>
-        </ThemedText.HeadlineSmall>
-        <ThemedText.BodySecondary>
-          <Trans>Latest swaps involving this token across Fenswap pools.</Trans>
-        </ThemedText.BodySecondary>
+        <ThemedText.HeadlineSmall>Recent swaps</ThemedText.HeadlineSmall>
+        <ThemedText.BodySecondary>Latest swaps involving this token across Fenswap pools.</ThemedText.BodySecondary>
       </Header>
       <ActivityTable
         swaps={relatedSwaps}
@@ -1495,12 +1482,12 @@ export default function ExplorerPage() {
     }
 
     if (activityError) {
-      return <ExplorerTableMessage message={t`The Fenine subgraph is not responding right now. Please try again.`} />
+      return <ExplorerTableMessage message="The Fenine subgraph is not responding right now. Please try again." />
     }
 
     if (activeTab === ExplorerTab.Pairs) {
       return poolsLoading && !topPools.length ? (
-        <ExplorerTableMessage message={t`Loading ranked pools...`} />
+        <ExplorerTableMessage message="Loading ranked pools..." />
       ) : (
         <PairsTable
           pools={topPools}
@@ -1518,7 +1505,7 @@ export default function ExplorerPage() {
 
     if (activeTab === ExplorerTab.Tokens) {
       return tokensLoading && !topTokens.length ? (
-        <ExplorerTableMessage message={t`Loading ranked tokens...`} />
+        <ExplorerTableMessage message="Loading ranked tokens..." />
       ) : (
         <TokensTable
           tokens={topTokens}
@@ -1536,11 +1523,11 @@ export default function ExplorerPage() {
 
     if (activeTab === ExplorerTab.Wallet) {
       if (!walletQueryEnabled) {
-        return <ExplorerTableMessage message={t`Enter a wallet address to inspect Fenswap activity.`} />
+        return <ExplorerTableMessage message="Enter a wallet address to inspect Fenswap activity." />
       }
 
       return walletLoading && !walletSwaps.length ? (
-        <ExplorerTableMessage message={t`Loading wallet activity...`} />
+        <ExplorerTableMessage message="Loading wallet activity..." />
       ) : (
         <ActivityTable
           swaps={walletSwaps}
@@ -1557,7 +1544,7 @@ export default function ExplorerPage() {
     }
 
     return activityLoading && !recentSwaps.length ? (
-      <ExplorerTableMessage message={t`Loading recent activity...`} />
+      <ExplorerTableMessage message="Loading recent activity..." />
     ) : (
       <ActivityTable
         swaps={recentSwaps}
@@ -1578,11 +1565,9 @@ export default function ExplorerPage() {
       <Header>
         <TitleRow>
           <div>
-            <ThemedText.Hero>
-              <Trans>Explorer</Trans>
-            </ThemedText.Hero>
+            <ThemedText.Hero>Explorer</ThemedText.Hero>
             <ThemedText.BodySecondary style={{ marginTop: 8 }}>
-              <Trans>Trace swaps, pools, tokens, and wallet activity directly from the Fenine subgraph.</Trans>
+              Trace swaps, pools, tokens, and wallet activity directly from the Fenine subgraph.
             </ThemedText.BodySecondary>
           </div>
           <Badge>
@@ -1594,13 +1579,13 @@ export default function ExplorerPage() {
 
       <TabsRow>
         <TabButton active={activeTab === ExplorerTab.Activity} onClick={() => navigate('/explorer')}>
-          <Trans>Activity</Trans>
+          Activity
         </TabButton>
         <TabButton active={activeTab === ExplorerTab.Pairs} onClick={() => navigate('/explorer/pairs')}>
-          <Trans>Pairs</Trans>
+          Pairs
         </TabButton>
         <TabButton active={activeTab === ExplorerTab.Tokens} onClick={() => navigate('/explorer/tokens')}>
-          <Trans>Tokens</Trans>
+          Tokens
         </TabButton>
         <TabButton
           active={activeTab === ExplorerTab.Wallet}
@@ -1610,7 +1595,7 @@ export default function ExplorerPage() {
             )
           }
         >
-          <Trans>Wallet</Trans>
+          Wallet
         </TabButton>
       </TabsRow>
 
@@ -1655,9 +1640,7 @@ export default function ExplorerPage() {
           onChange={(event) => setWalletInput(event.target.value)}
           placeholder="0x... wallet address"
         />
-        <PrimaryButton type="submit">
-          <Trans>View wallet</Trans>
-        </PrimaryButton>
+        <PrimaryButton type="submit">View wallet</PrimaryButton>
       </WalletBar>
 
       {renderContent()}
