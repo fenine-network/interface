@@ -4,8 +4,6 @@ import { useAccountDrawer } from 'components/AccountDrawer'
 import { UniIcon } from 'components/Logo/UniIcon'
 import Web3Status from 'components/Web3Status'
 import { chainIdToBackendName } from 'graphql/data/util'
-import { useDisableNFTRoutes } from 'hooks/useDisableNFTRoutes'
-import { useIsNftPage } from 'hooks/useIsNftPage'
 import { useIsPoolsPage } from 'hooks/useIsPoolsPage'
 import { Box } from 'nft/components/Box'
 import { Row } from 'nft/components/Flex'
@@ -58,9 +56,6 @@ export const PageTabs = () => {
   const chainName = chainIdToBackendName(connectedChainId)
 
   const isPoolActive = useIsPoolsPage()
-  const isNftPage = useIsNftPage()
-
-  const shouldDisableNFTRoutes = useDisableNFTRoutes()
 
   return (
     <>
@@ -73,11 +68,6 @@ export const PageTabs = () => {
       >
         <Trans>Explore</Trans>
       </MenuItem>
-      {!shouldDisableNFTRoutes && (
-        <MenuItem dataTestId="nft-nav" href="/nfts" isActive={isNftPage}>
-          <Trans>NFTs</Trans>
-        </MenuItem>
-      )}
       <Box display={{ sm: 'flex', lg: 'none', xxl: 'flex' }} width="full">
         <MenuItem href="/pools" dataTestId="pool-nav-link" isActive={isPoolActive}>
           <Trans>Pools</Trans>
@@ -91,7 +81,6 @@ export const PageTabs = () => {
 }
 
 const Navbar = ({ blur }: { blur: boolean }) => {
-  const isNftPage = useIsNftPage()
   const sellPageState = useProfilePageState((state) => state.state)
   const navigate = useNavigate()
   const isNavSearchInputVisible = useIsNavSearchInputVisible()
@@ -123,11 +112,9 @@ const Navbar = ({ blur }: { blur: boolean }) => {
                 onClick={handleUniIconClick}
               />
             </Box>
-            {!isNftPage && (
-              <Box display={{ sm: 'flex', lg: 'none' }}>
-                <ChainSelector leftAlign={true} />
-              </Box>
-            )}
+            <Box display={{ sm: 'flex', lg: 'none' }}>
+              <ChainSelector leftAlign={true} />
+            </Box>
             <Row display={{ sm: 'none', lg: 'flex' }}>
               <PageTabs />
             </Row>
@@ -145,8 +132,8 @@ const Navbar = ({ blur }: { blur: boolean }) => {
               <Box position="relative" display={isNavSearchInputVisible ? 'none' : { sm: 'flex' }}>
                 <SearchBar />
               </Box>
-              {isNftPage && sellPageState !== ProfilePageStateType.LISTING && <Bag />}
-              {!isNftPage && (
+              {sellPageState === ProfilePageStateType.LISTING && <Bag />}
+              {sellPageState !== ProfilePageStateType.LISTING && (
                 <Box display={{ sm: 'none', lg: 'flex' }}>
                   <ChainSelector />
                 </Box>

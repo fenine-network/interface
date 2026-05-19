@@ -1,21 +1,14 @@
 import { t } from '@lingui/macro'
 import { useInfoExplorePageEnabled } from 'featureFlags/flags/infoExplore'
 import { useInfoPoolPageEnabled } from 'featureFlags/flags/infoPoolPage'
-import { useAtom } from 'jotai'
 import { lazy, ReactNode, Suspense, useMemo } from 'react'
 import { matchPath, Navigate, useLocation } from 'react-router-dom'
-import { shouldDisableNFTRoutesAtom } from 'state/application/atoms'
-import { SpinnerSVG } from 'theme/components'
 import { isBrowserRouterEnabled } from 'utils/env'
 
 // High-traffic pages (index and /swap) should not be lazy-loaded.
 import Landing from './Landing'
 import Swap from './Swap'
 
-const NftExplore = lazy(() => import('nft/pages/explore'))
-const Collection = lazy(() => import('nft/pages/collection'))
-const Profile = lazy(() => import('nft/pages/profile'))
-const Asset = lazy(() => import('nft/pages/asset/Asset'))
 const Explore = lazy(() => import('pages/Explore'))
 const ExplorerPage = lazy(() => import('pages/Explorer'))
 const AddLiquidityWithTokenRedirects = lazy(() => import('pages/AddLiquidity/redirects'))
@@ -32,28 +25,12 @@ const PoolFinder = lazy(() => import('pages/PoolFinder'))
 const RemoveLiquidity = lazy(() => import('pages/RemoveLiquidity'))
 const RemoveLiquidityV3 = lazy(() => import('pages/RemoveLiquidity/V3'))
 const TokenDetails = lazy(() => import('pages/TokenDetails'))
-const Vote = lazy(() => import('pages/Vote'))
-
-// this is the same svg defined in assets/images/blue-loader.svg
-// it is defined here because the remote asset may not have had time to load when this file is executing
-const LazyLoadSpinner = () => (
-  <SpinnerSVG width="94" height="94" viewBox="0 0 94 94" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M92 47C92 22.1472 71.8528 2 47 2C22.1472 2 2 22.1472 2 47C2 71.8528 22.1472 92 47 92"
-      stroke="#2172E5"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </SpinnerSVG>
-)
 
 interface RouterConfig {
   browserRouterEnabled?: boolean
   hash?: string
   infoExplorePageEnabled?: boolean
   infoPoolPageEnabled?: boolean
-  shouldDisableNFTRoutes?: boolean
 }
 
 /**
@@ -64,16 +41,14 @@ export function useRouterConfig(): RouterConfig {
   const { hash } = useLocation()
   const infoPoolPageEnabled = useInfoPoolPageEnabled()
   const infoExplorePageEnabled = useInfoExplorePageEnabled()
-  const [shouldDisableNFTRoutes] = useAtom(shouldDisableNFTRoutesAtom)
   return useMemo(
     () => ({
       browserRouterEnabled,
       hash,
       infoExplorePageEnabled,
       infoPoolPageEnabled,
-      shouldDisableNFTRoutes: Boolean(shouldDisableNFTRoutes),
     }),
-    [browserRouterEnabled, hash, infoExplorePageEnabled, infoPoolPageEnabled, shouldDisableNFTRoutes]
+    [browserRouterEnabled, hash, infoExplorePageEnabled, infoPoolPageEnabled]
   )
 }
 
@@ -164,18 +139,14 @@ export const routes: RouteDefinition[] = [
     enabled: (args) => Boolean(args.infoExplorePageEnabled && args.infoPoolPageEnabled),
   }),
   createRouteDefinition({
-    path: '/vote/*',
-    staticTitle: t`Vote on Fenswap`,
-    getElement: () => (
-      <Suspense fallback={<LazyLoadSpinner />}>
-        <Vote />
-      </Suspense>
-    ),
-  }),
-  createRouteDefinition({
     path: '/create-proposal',
     staticTitle: t`Fenswap Governance Proposals`,
-    getElement: () => <Navigate to="/vote/create-proposal" replace />,
+    getElement: () => <Navigate to="/explorer" replace />,
+  }),
+  createRouteDefinition({
+    path: '/vote/*',
+    staticTitle: t`Explorer on Fenswap`,
+    getElement: () => <Navigate to="/explorer" replace />,
   }),
   createRouteDefinition({
     path: '/send',
@@ -249,53 +220,14 @@ export const routes: RouteDefinition[] = [
   }),
   createRouteDefinition({
     path: '/nfts',
-    getElement: () => (
-      <Suspense fallback={null}>
-        <NftExplore />
-      </Suspense>
-    ),
-    enabled: (args) => !args.shouldDisableNFTRoutes,
-    staticTitle: t`Explore NFTs on Fenswap`,
-  }),
-  createRouteDefinition({
-    path: '/nfts/asset/:contractAddress/:tokenId',
-    getElement: () => (
-      <Suspense fallback={null}>
-        <Asset />
-      </Suspense>
-    ),
-    enabled: (args) => !args.shouldDisableNFTRoutes,
-    staticTitle: t`Explore NFTs on Fenswap`,
-  }),
-  createRouteDefinition({
-    path: '/nfts/profile',
-    getElement: () => (
-      <Suspense fallback={null}>
-        <Profile />
-      </Suspense>
-    ),
-    enabled: (args) => !args.shouldDisableNFTRoutes,
-    staticTitle: t`Explore NFTs on Fenswap`,
-  }),
-  createRouteDefinition({
-    path: '/nfts/collection/:contractAddress',
-    getElement: () => (
-      <Suspense fallback={null}>
-        <Collection />
-      </Suspense>
-    ),
-    enabled: (args) => !args.shouldDisableNFTRoutes,
-    staticTitle: t`Explore NFTs on Fenswap`,
-  }),
-  createRouteDefinition({
-    path: '/nfts/collection/:contractAddress/activity',
-    getElement: () => (
-      <Suspense fallback={null}>
-        <Collection />
-      </Suspense>
-    ),
-    enabled: (args) => !args.shouldDisableNFTRoutes,
-    staticTitle: t`Explore NFTs on Fenswap`,
+    nestedPaths: [
+      'asset/:contractAddress/:tokenId',
+      'profile',
+      'collection/:contractAddress',
+      'collection/:contractAddress/activity',
+    ],
+    getElement: () => <Navigate to="/explorer" replace />,
+    staticTitle: t`Explorer on Fenswap`,
   }),
   createRouteDefinition({ path: '*', getElement: () => <Navigate to="/not-found" replace /> }),
   createRouteDefinition({ path: '/not-found', getElement: () => <NotFound /> }),

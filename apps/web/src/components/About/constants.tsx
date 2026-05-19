@@ -7,7 +7,6 @@ import darkArrowImgSrc from './images/aboutArrowDark.png'
 import lightArrowImgSrc from './images/aboutArrowLight.png'
 import darkDollarImgSrc from './images/aboutDollarDark.png'
 import darkTerminalImgSrc from './images/aboutTerminalDark.png'
-import nftCardImgSrc from './images/nftCard.png'
 import swapCardImgSrc from './images/swapCard.png'
 
 export const MAIN_CARDS = [
@@ -19,15 +18,6 @@ export const MAIN_CARDS = [
     darkBackgroundImgSrc: swapCardImgSrc,
     lightBackgroundImgSrc: swapCardImgSrc,
     elementName: InterfaceElementName.ABOUT_PAGE_SWAP_CARD,
-  },
-  {
-    to: '/nfts',
-    title: 'Trade NFTs',
-    description: 'Discover NFT collections and manage activity alongside the rest of your Fenine assets.',
-    cta: 'Explore NFTs',
-    darkBackgroundImgSrc: nftCardImgSrc,
-    lightBackgroundImgSrc: nftCardImgSrc,
-    elementName: InterfaceElementName.ABOUT_PAGE_NFTS_CARD,
   },
 ]
 

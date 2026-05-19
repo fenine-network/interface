@@ -9,7 +9,6 @@ import {
   DiscordIconMenu,
   EllipsisIcon,
   GithubIconMenu,
-  GovernanceIcon,
   PoolIcon,
   TwitterIconMenu,
 } from 'nft/components/icons'
@@ -149,14 +148,6 @@ export const MenuDropdown = () => {
                     </PrimaryMenuRow.Text>
                   </PrimaryMenuRow>
                 </Box>
-                <PrimaryMenuRow to="/vote" close={toggleOpen}>
-                  <Icon>
-                    <GovernanceIcon width={24} height={24} color={theme.neutral1} />
-                  </Icon>
-                  <PrimaryMenuRow.Text>
-                    <Trans>Vote in governance</Trans>
-                  </PrimaryMenuRow.Text>
-                </PrimaryMenuRow>
                 <PrimaryMenuRow href="https://swap.fene.app/analytics">
                   <Icon>
                     <BarChartIcon width={24} height={24} color={theme.neutral1} />

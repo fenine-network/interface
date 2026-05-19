@@ -9,7 +9,6 @@ import { MAIN_CARDS, MORE_CARDS } from 'components/About/constants'
 import ProtocolBanner from 'components/About/ProtocolBanner'
 import { useAccountDrawer } from 'components/AccountDrawer'
 import { BaseButton } from 'components/Button'
-import { useDisableNFTRoutes } from 'hooks/useDisableNFTRoutes'
 import Swap from 'pages/Swap'
 import { parse } from 'qs'
 import { useEffect, useMemo, useRef } from 'react'
@@ -45,11 +44,7 @@ const Gradient = styled.div<{ isDarkMode: boolean }>`
   ${({ isDarkMode }) =>
     isDarkMode
       ? css`
-          background: linear-gradient(
-            rgba(59, 60, 58, 0) 0%,
-            rgba(59, 60, 58, 0.82) 42%,
-            rgba(59, 60, 58, 0.98) 100%
-          );
+          background: linear-gradient(rgba(59, 60, 58, 0) 0%, rgba(59, 60, 58, 0.82) 42%, rgba(59, 60, 58, 0.98) 100%);
         `
       : css`
           background: linear-gradient(
@@ -85,8 +80,7 @@ const Glow = styled.div`
   position: absolute;
   top: 68px;
   bottom: 0;
-  background:
-    radial-gradient(72.04% 72.04% at 50% 3.99%, rgba(250, 247, 227, 0.26) 0%, rgba(250, 247, 227, 0) 74%),
+  background: radial-gradient(72.04% 72.04% at 50% 3.99%, rgba(250, 247, 227, 0.26) 0%, rgba(250, 247, 227, 0) 74%),
     radial-gradient(58% 58% at 50% 18%, rgba(214, 207, 180, 0.18) 0%, rgba(214, 207, 180, 0) 100%);
   filter: blur(84px);
   border-radius: 24px;
@@ -334,11 +328,7 @@ export default function Landing() {
   const cardsRef = useRef<HTMLDivElement>(null)
   const { account } = useWeb3React()
 
-  const shouldDisableNFTRoutes = useDisableNFTRoutes()
-  const cards = useMemo(
-    () => MAIN_CARDS.filter((card) => !(shouldDisableNFTRoutes && card.to.startsWith('/nft'))),
-    [shouldDisableNFTRoutes]
-  )
+  const cards = useMemo(() => MAIN_CARDS, [])
 
   const [accountDrawerOpen] = useAccountDrawer()
   const navigate = useNavigate()
@@ -377,19 +367,11 @@ export default function Landing() {
         </GlowContainer>
         <ContentContainer isDarkMode={isDarkMode}>
           <TitleText isDarkMode={isDarkMode}>
-            {shouldDisableNFTRoutes ? (
-              <Trans>Trade on Fenswap with confidence</Trans>
-            ) : (
-              <Trans>Trade on Fenswap with confidence</Trans>
-            )}
+            <Trans>Trade on Fenswap with confidence</Trans>
           </TitleText>
           <SubTextContainer>
             <SubText>
-              {shouldDisableNFTRoutes ? (
-                <Trans>Buy, sell, and explore tokens on Fenine</Trans>
-              ) : (
-                <Trans>Buy, sell, and explore tokens and NFTs on Fenine</Trans>
-              )}
+              <Trans>Buy, sell, and explore tokens on Fenine</Trans>
             </SubText>
           </SubTextContainer>
           <ActionsContainer>
@@ -414,10 +396,8 @@ export default function Landing() {
           </LearnMoreContainer>
 
           <EcosystemLink href="https://swap.fene.app" rel="noopener noreferrer" target="_blank">
-            <>
-              <EcosystemMark isDarkMode={isDarkMode} width="20" height="20" />
-              Visit Fenswap
-            </>
+            <EcosystemMark isDarkMode={isDarkMode} width="20" height="20" />
+            Visit Fenswap
           </EcosystemLink>
         </ContentContainer>
         <AboutContentContainer isDarkMode={isDarkMode}>
